@@ -5,7 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { v4 as uuidv4 } from 'uuid';
@@ -193,7 +193,7 @@ export class MediaService {
       where: {
         entityId,
         entityType,
-        deletedAt: null,
+        deletedAt: IsNull(),
       },
       order: {
         createdAt: 'DESC',
@@ -295,7 +295,7 @@ export class MediaService {
   async markAsFailed(mediaId: string, error: string): Promise<void> {
     await this.mediaRepository.update(mediaId, {
       status: MediaStatus.FAILED,
-      metadata: { error },
+      metadata: { error } as any,
     });
 
     this.logger.error(`Media processing failed: ${mediaId} - ${error}`);
@@ -310,7 +310,7 @@ export class MediaService {
     byCategory: Record<string, { count: number; size: number }>;
   }> {
     const media = await this.mediaRepository.find({
-      where: { userId, deletedAt: null },
+      where: { userId, deletedAt: IsNull() },
     });
 
     const stats = {
@@ -400,7 +400,7 @@ export class MediaService {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
 
-    const folder = StorageConfig.FOLDERS[category] || 'uploads';
+    const folder = (StorageConfig.FOLDERS as any)[category] || 'uploads';
     return `${folder}/${year}/${month}/${filename}`;
   }
 
