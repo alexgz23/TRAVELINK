@@ -14,6 +14,7 @@ import { HttpExceptionFilter } from './common/filters';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ExperiencesModule } from './modules/experiences/experiences.module';
+import { BookingsModule } from './modules/bookings/bookings.module';
 
 @Module({
   imports: [
@@ -41,7 +42,7 @@ import { ExperiencesModule } from './modules/experiences/experiences.module';
     AuthModule,
     UsersModule,
     ExperiencesModule,
-    // BookingsModule,
+    BookingsModule,
     // PaymentsModule,
     // SocialModule,
     // B2BModule,
