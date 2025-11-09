@@ -7,8 +7,15 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 import { AppModule } from './app.module';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { SentryInterceptor } from './common/interceptors/sentry.interceptor';
+import { SentryExceptionFilter } from './common/filters/sentry-exception.filter';
+import { LoggerService } from './common/logger/logger.service';
+import { initializeSentry, closeSentry } from './common/sentry/sentry.config';
 
 async function bootstrap() {
+  // Inicializar Sentry antes de crear la aplicación
+  initializeSentry();
+
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
@@ -17,8 +24,17 @@ async function bootstrap() {
   const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
   app.useLogger(logger);
 
-  // Interceptor de logging global
-  app.useGlobalInterceptors(new LoggingInterceptor(logger as any));
+  // Obtener LoggerService para el filtro de excepciones
+  const loggerService = app.get(LoggerService);
+
+  // Filtro global de excepciones con Sentry
+  app.useGlobalFilters(new SentryExceptionFilter(loggerService));
+
+  // Interceptores globales
+  app.useGlobalInterceptors(
+    new SentryInterceptor(),
+    new LoggingInterceptor(logger as any),
+  );
 
   // Security
   app.use(helmet());
@@ -115,9 +131,30 @@ async function bootstrap() {
   logger.log(`📚 API Documentation: http://localhost:${port}/api/docs`);
   logger.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
   logger.log(`🔒 CORS enabled for: ${process.env.CORS_ORIGIN || 'http://localhost:3000'}`);
+  if (process.env.SENTRY_DSN) {
+    logger.log(`📊 Sentry monitoring enabled`);
+  }
+
+  // Graceful shutdown
+  process.on('SIGTERM', async () => {
+    logger.log('⚠️  SIGTERM signal received: closing HTTP server');
+    await closeSentry();
+    await app.close();
+    logger.log('✅ HTTP server closed');
+    process.exit(0);
+  });
+
+  process.on('SIGINT', async () => {
+    logger.log('⚠️  SIGINT signal received: closing HTTP server');
+    await closeSentry();
+    await app.close();
+    logger.log('✅ HTTP server closed');
+    process.exit(0);
+  });
 }
 
-bootstrap().catch((error) => {
+bootstrap().catch(async (error) => {
   console.error('❌ Failed to start application:', error);
+  await closeSentry();
   process.exit(1);
 });

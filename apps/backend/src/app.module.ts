@@ -11,6 +11,7 @@ import { getTypeOrmConfig } from './config/typeorm.config';
 import { JwtAuthGuard, RolesGuard } from './common/guards';
 import { HttpExceptionFilter } from './common/filters';
 import { LoggerModule } from './common/logger/logger.module';
+import { HealthModule } from './health/health.module';
 
 // Feature modules
 import { AuthModule } from './modules/auth/auth.module';
@@ -57,6 +58,9 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
 
     // Logging
     LoggerModule,
+
+    // Health check
+    HealthModule,
 
     // Feature modules
     AuthModule,
