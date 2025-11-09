@@ -21,6 +21,7 @@ import { SocialModule } from './modules/social/social.module';
 import { PointsModule } from './modules/points/points.module';
 import { AdsModule } from './modules/ads/ads.module';
 import { B2BModule } from './modules/b2b/b2b.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { B2BModule } from './modules/b2b/b2b.module';
     PointsModule,
     AdsModule,
     B2BModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

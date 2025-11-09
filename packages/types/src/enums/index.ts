@@ -7,3 +7,4 @@ export * from './social.enum';
 export * from './points.enum';
 export * from './ads.enum';
 export * from './b2b.enum';
+export * from './notification.enum';
