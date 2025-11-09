@@ -11,6 +11,7 @@ import { UsersService } from '@/modules/users/users.service';
 import { RegisterDto, LoginDto, AuthResponseDto } from './dto';
 import { User } from '@/modules/users/entities';
 import { JwtPayload } from './strategies/jwt.strategy';
+import { LoggerService } from '@/common/logger/logger.service';
 
 @Injectable()
 export class AuthService {
@@ -18,15 +19,23 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+    private readonly logger: LoggerService,
+  ) {
+    this.logger.setContext('AuthService');
+  }
 
   /**
    * Registrar nuevo usuario
    */
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
+    this.logger.auth('User registration attempt', undefined, { email: registerDto.email });
+
     // Verificar si el email ya existe
     const existingUser = await this.usersService.findByEmail(registerDto.email);
     if (existingUser) {
+      this.logger.warn('Registration failed: Email already exists', 'AuthService', {
+        email: registerDto.email,
+      });
       throw new ConflictException('El email ya está registrado');
     }
 
@@ -41,6 +50,11 @@ export class AuthService {
       displayName: registerDto.displayName,
     });
 
+    this.logger.auth('User registered successfully', user.id, {
+      email: user.email,
+      role: user.role,
+    });
+
     // Generar tokens
     return this.generateAuthResponse(user);
   }
@@ -49,10 +63,15 @@ export class AuthService {
    * Login de usuario
    */
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
+    this.logger.auth('Login attempt', undefined, { email: loginDto.email });
+
     // Buscar usuario con password
     const user = await this.usersService.findByEmailWithPassword(loginDto.email);
 
     if (!user) {
+      this.logger.security('Failed login attempt: User not found', 'low', {
+        email: loginDto.email,
+      });
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
@@ -60,11 +79,20 @@ export class AuthService {
     const isPasswordValid = await this.comparePassword(loginDto.password, user.passwordHash!);
 
     if (!isPasswordValid) {
+      this.logger.security('Failed login attempt: Invalid password', 'medium', {
+        userId: user.id,
+        email: user.email,
+      });
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
     // Actualizar último login
     await this.usersService.updateLastLogin(user.id);
+
+    this.logger.auth('User logged in successfully', user.id, {
+      email: user.email,
+      role: user.role,
+    });
 
     // Generar tokens
     return this.generateAuthResponse(user);

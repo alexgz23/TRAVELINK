@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User, UserProfile } from './entities';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserRole, UserStatus } from '@viajero-conectado/types';
+import { LoggerService } from '@/common/logger/logger.service';
 
 @Injectable()
 export class UsersService {
@@ -12,7 +13,10 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserProfile)
     private readonly profileRepository: Repository<UserProfile>,
-  ) {}
+    private readonly logger: LoggerService,
+  ) {
+    this.logger.setContext('UsersService');
+  }
 
   /**
    * Crear un nuevo usuario
@@ -21,6 +25,9 @@ export class UsersService {
     // Verificar si el email ya existe
     const existingUser = await this.findByEmail(createUserDto.email);
     if (existingUser) {
+      this.logger.warn('User creation failed: Email already exists', 'UsersService', {
+        email: createUserDto.email,
+      });
       throw new ConflictException('El email ya está registrado');
     }
 
@@ -42,6 +49,11 @@ export class UsersService {
       });
       await this.profileRepository.save(profile);
     }
+
+    this.logger.business('create', 'user', savedUser.id, {
+      email: savedUser.email,
+      role: savedUser.role,
+    });
 
     return savedUser;
   }
@@ -65,6 +77,7 @@ export class UsersService {
     });
 
     if (!user) {
+      this.logger.warn('User not found', 'UsersService', { userId: id });
       throw new NotFoundException('Usuario no encontrado');
     }
 
@@ -102,7 +115,11 @@ export class UsersService {
 
     Object.assign(user, updateUserDto);
 
-    return this.userRepository.save(user);
+    const updatedUser = await this.userRepository.save(user);
+
+    this.logger.business('update', 'user', id, { fields: Object.keys(updateUserDto) });
+
+    return updatedUser;
   }
 
   /**
@@ -110,8 +127,11 @@ export class UsersService {
    */
   async remove(id: string): Promise<void> {
     const user = await this.findOne(id);
+
     user.status = UserStatus.DELETED;
     await this.userRepository.save(user);
+
+    this.logger.business('delete', 'user', id, { email: user.email });
   }
 
   /**
@@ -122,6 +142,8 @@ export class UsersService {
       emailVerified: true,
       emailVerifiedAt: new Date(),
     });
+
+    this.logger.business('verifyEmail', 'user', userId);
   }
 
   /**

@@ -10,6 +10,7 @@ import { Booking, BookingTraveler } from './entities';
 import { CreateBookingDto, UpdateBookingDto, AddTravelerDto, FilterBookingDto } from './dto';
 import { BookingStatus } from '@viajero-conectado/types';
 import { ExperiencesService } from '../experiences/experiences.service';
+import { LoggerService } from '@/common/logger/logger.service';
 
 @Injectable()
 export class BookingsService {
@@ -19,7 +20,10 @@ export class BookingsService {
     @InjectRepository(BookingTraveler)
     private readonly travelerRepository: Repository<BookingTraveler>,
     private readonly experiencesService: ExperiencesService,
-  ) {}
+    private readonly logger: LoggerService,
+  ) {
+    this.logger.setContext('BookingsService');
+  }
 
   /**
    * Crear nueva reserva
@@ -29,6 +33,10 @@ export class BookingsService {
     const experience = await this.experiencesService.findOne(createDto.experienceId);
 
     if (experience.status !== 'published') {
+      this.logger.warn('Booking creation failed: Experience not published', 'BookingsService', {
+        experienceId: createDto.experienceId,
+        status: experience.status,
+      });
       throw new BadRequestException('La experiencia no está disponible para reservar');
     }
 
@@ -49,7 +57,16 @@ export class BookingsService {
       status: BookingStatus.PENDING,
     });
 
-    return this.bookingRepository.save(booking);
+    const saved = await this.bookingRepository.save(booking);
+
+    this.logger.business('create', 'booking', saved.id, {
+      bookingNumber: saved.bookingNumber,
+      userId,
+      experienceId: createDto.experienceId,
+      totalAmount: saved.totalAmount,
+    });
+
+    return saved;
   }
 
   /**
@@ -242,17 +259,33 @@ export class BookingsService {
 
     // Verificar que la experiencia pertenece a la agencia
     if (booking.experience.agencyId !== agencyId) {
+      this.logger.security('Unauthorized booking confirmation attempt', 'high', {
+        bookingId: id,
+        bookingAgencyId: booking.experience.agencyId,
+        attemptedBy: agencyId,
+      });
       throw new ForbiddenException('No tienes permisos para confirmar esta reserva');
     }
 
     if (booking.status !== BookingStatus.PENDING) {
+      this.logger.warn('Booking confirmation failed: Invalid status', 'BookingsService', {
+        bookingId: id,
+        currentStatus: booking.status,
+      });
       throw new BadRequestException('Solo se pueden confirmar reservas pendientes');
     }
 
     booking.status = BookingStatus.CONFIRMED;
     booking.confirmedAt = new Date();
 
-    return this.bookingRepository.save(booking);
+    const confirmed = await this.bookingRepository.save(booking);
+
+    this.logger.business('confirm', 'booking', id, {
+      bookingNumber: booking.bookingNumber,
+      agencyId,
+    });
+
+    return confirmed;
   }
 
   /**
@@ -262,17 +295,34 @@ export class BookingsService {
     const booking = await this.findOne(id);
 
     if (booking.experience.agencyId !== agencyId) {
+      this.logger.security('Unauthorized booking completion attempt', 'high', {
+        bookingId: id,
+        bookingAgencyId: booking.experience.agencyId,
+        attemptedBy: agencyId,
+      });
       throw new ForbiddenException('No tienes permisos para completar esta reserva');
     }
 
     if (booking.status !== BookingStatus.CONFIRMED) {
+      this.logger.warn('Booking completion failed: Invalid status', 'BookingsService', {
+        bookingId: id,
+        currentStatus: booking.status,
+      });
       throw new BadRequestException('Solo se pueden completar reservas confirmadas');
     }
 
     booking.status = BookingStatus.COMPLETED;
     booking.completedAt = new Date();
 
-    return this.bookingRepository.save(booking);
+    const completed = await this.bookingRepository.save(booking);
+
+    this.logger.business('complete', 'booking', id, {
+      bookingNumber: booking.bookingNumber,
+      agencyId,
+      totalAmount: booking.totalAmount,
+    });
+
+    return completed;
   }
 
   /**
@@ -286,14 +336,26 @@ export class BookingsService {
     const isAgency = booking.experience.agencyId === userId;
 
     if (!isOwner && !isAgency) {
+      this.logger.security('Unauthorized booking cancellation attempt', 'medium', {
+        bookingId: id,
+        bookingUserId: booking.userId,
+        bookingAgencyId: booking.experience.agencyId,
+        attemptedBy: userId,
+      });
       throw new ForbiddenException('No tienes permisos para cancelar esta reserva');
     }
 
     if (booking.status === BookingStatus.COMPLETED) {
+      this.logger.warn('Booking cancellation failed: Already completed', 'BookingsService', {
+        bookingId: id,
+      });
       throw new BadRequestException('No puedes cancelar una reserva completada');
     }
 
     if (booking.status === BookingStatus.CANCELLED) {
+      this.logger.warn('Booking cancellation failed: Already cancelled', 'BookingsService', {
+        bookingId: id,
+      });
       throw new BadRequestException('La reserva ya está cancelada');
     }
 
@@ -301,7 +363,16 @@ export class BookingsService {
     booking.cancellationReason = reason;
     booking.cancelledAt = new Date();
 
-    return this.bookingRepository.save(booking);
+    const cancelled = await this.bookingRepository.save(booking);
+
+    this.logger.business('cancel', 'booking', id, {
+      bookingNumber: booking.bookingNumber,
+      userId,
+      isAgency,
+      reason,
+    });
+
+    return cancelled;
   }
 
   /**

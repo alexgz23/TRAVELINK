@@ -22,6 +22,7 @@ import {
 } from './dto';
 import { ExperienceStatus } from '@viajero-conectado/types';
 import { slugify } from '@viajero-conectado/shared';
+import { LoggerService } from '@/common/logger/logger.service';
 
 @Injectable()
 export class ExperiencesService {
@@ -34,7 +35,10 @@ export class ExperiencesService {
     private readonly mediaRepository: Repository<ExperienceMedia>,
     @InjectRepository(ExperienceItinerary)
     private readonly itineraryRepository: Repository<ExperienceItinerary>,
-  ) {}
+    private readonly logger: LoggerService,
+  ) {
+    this.logger.setContext('ExperiencesService');
+  }
 
   /**
    * Crear nueva experiencia
@@ -65,7 +69,16 @@ export class ExperiencesService {
       status: ExperienceStatus.DRAFT,
     });
 
-    return this.experienceRepository.save(experience);
+    const saved = await this.experienceRepository.save(experience);
+
+    this.logger.business('create', 'experience', saved.id, {
+      agencyId,
+      title: saved.title,
+      slug: saved.slug,
+      category: createDto.category,
+    });
+
+    return saved;
   }
 
   /**
@@ -202,6 +215,11 @@ export class ExperiencesService {
 
     // Verificar que el usuario sea el dueño
     if (experience.agencyId !== userId) {
+      this.logger.security('Unauthorized experience update attempt', 'medium', {
+        experienceId: id,
+        agencyId: experience.agencyId,
+        attemptedBy: userId,
+      });
       throw new ForbiddenException('No tienes permisos para actualizar esta experiencia');
     }
 
@@ -235,7 +253,14 @@ export class ExperiencesService {
       currency: updateDto.currency,
     });
 
-    return this.experienceRepository.save(experience);
+    const updated = await this.experienceRepository.save(experience);
+
+    this.logger.business('update', 'experience', id, {
+      userId,
+      fields: Object.keys(updateDto),
+    });
+
+    return updated;
   }
 
   /**
@@ -245,10 +270,20 @@ export class ExperiencesService {
     const experience = await this.findOne(id);
 
     if (experience.agencyId !== userId) {
+      this.logger.security('Unauthorized experience deletion attempt', 'high', {
+        experienceId: id,
+        agencyId: experience.agencyId,
+        attemptedBy: userId,
+      });
       throw new ForbiddenException('No tienes permisos para eliminar esta experiencia');
     }
 
     await this.experienceRepository.remove(experience);
+
+    this.logger.business('delete', 'experience', id, {
+      userId,
+      title: experience.title,
+    });
   }
 
   /**
@@ -258,21 +293,39 @@ export class ExperiencesService {
     const experience = await this.findOne(id);
 
     if (experience.agencyId !== userId) {
+      this.logger.security('Unauthorized experience publish attempt', 'medium', {
+        experienceId: id,
+        agencyId: experience.agencyId,
+        attemptedBy: userId,
+      });
       throw new ForbiddenException('No tienes permisos para publicar esta experiencia');
     }
 
     // Validar que tenga al menos una variante
     if (!experience.variants || experience.variants.length === 0) {
+      this.logger.warn('Experience publish failed: No variants', 'ExperiencesService', {
+        experienceId: id,
+      });
       throw new BadRequestException('Debes agregar al menos una variante antes de publicar');
     }
 
     // Validar que tenga al menos una imagen
     if (!experience.media || experience.media.length === 0) {
+      this.logger.warn('Experience publish failed: No media', 'ExperiencesService', {
+        experienceId: id,
+      });
       throw new BadRequestException('Debes agregar al menos una imagen antes de publicar');
     }
 
     experience.status = ExperienceStatus.PUBLISHED;
-    return this.experienceRepository.save(experience);
+    const published = await this.experienceRepository.save(experience);
+
+    this.logger.business('publish', 'experience', id, {
+      userId,
+      title: experience.title,
+    });
+
+    return published;
   }
 
   /**

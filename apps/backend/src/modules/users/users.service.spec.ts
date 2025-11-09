@@ -5,6 +5,7 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User, UserProfile } from './entities';
 import { UserRole, UserStatus } from '../../../../../packages/types/src/enums/user.enum';
+import { LoggerService } from '@/common/logger/logger.service';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -57,6 +58,16 @@ describe('UsersService', () => {
             create: jest.fn(),
             save: jest.fn(),
             findOne: jest.fn(),
+          },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            setContext: jest.fn(),
+            business: jest.fn(),
+            warn: jest.fn(),
+            error: jest.fn(),
+            log: jest.fn(),
           },
         },
       ],

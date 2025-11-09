@@ -5,6 +5,7 @@ import { ConflictException, UnauthorizedException, BadRequestException } from '@
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { UserRole, UserStatus } from '../../../../../packages/types/src/enums/user.enum';
+import { LoggerService } from '@/common/logger/logger.service';
 
 // Mock de bcrypt
 jest.mock('bcrypt', () => ({
@@ -78,6 +79,17 @@ describe('AuthService', () => {
           provide: ConfigService,
           useValue: {
             get: jest.fn(),
+          },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            setContext: jest.fn(),
+            auth: jest.fn(),
+            security: jest.fn(),
+            warn: jest.fn(),
+            error: jest.fn(),
+            log: jest.fn(),
           },
         },
       ],

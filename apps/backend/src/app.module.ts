@@ -10,6 +10,7 @@ import { AppService } from './app.service';
 import { getTypeOrmConfig } from './config/typeorm.config';
 import { JwtAuthGuard, RolesGuard } from './common/guards';
 import { HttpExceptionFilter } from './common/filters';
+import { LoggerModule } from './common/logger/logger.module';
 
 // Feature modules
 import { AuthModule } from './modules/auth/auth.module';
@@ -53,6 +54,9 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
         limit: 100, // 100 requests
       },
     ]),
+
+    // Logging
+    LoggerModule,
 
     // Feature modules
     AuthModule,
