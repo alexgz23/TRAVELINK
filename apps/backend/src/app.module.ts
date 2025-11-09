@@ -25,6 +25,7 @@ import { AdsModule } from './modules/ads/ads.module';
 import { B2BModule } from './modules/b2b/b2b.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     B2BModule,
     NotificationsModule,
     ReviewsModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [

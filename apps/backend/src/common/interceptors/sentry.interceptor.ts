@@ -15,19 +15,7 @@ import * as Sentry from '@sentry/node';
 export class SentryInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
-    const { method, url, headers, body, query, params } = request;
-
-    // Crear transacción de Sentry
-    const transaction = Sentry.startTransaction({
-      op: 'http.server',
-      name: `${method} ${url}`,
-      data: {
-        method,
-        url,
-        query,
-        params,
-      },
-    });
+    const { method, url, query, params } = request;
 
     // Agregar contexto del usuario si existe
     const user = request.user;
@@ -52,26 +40,13 @@ export class SentryInterceptor implements NestInterceptor {
       },
     });
 
-    const startTime = Date.now();
-
     return next.handle().pipe(
       tap({
         next: () => {
-          const duration = Date.now() - startTime;
-          transaction.setStatus('ok');
-          transaction.setData('duration', duration);
-          transaction.finish();
-
-          // Limpiar contexto de usuario
+          // Limpiar contexto de usuario después de la request
           Sentry.setUser(null);
         },
-        error: (error) => {
-          const duration = Date.now() - startTime;
-          transaction.setStatus('internal_error');
-          transaction.setData('duration', duration);
-          transaction.setData('error', error.message);
-          transaction.finish();
-
+        error: () => {
           // El error será capturado por SentryExceptionFilter
           // Limpiar contexto de usuario
           Sentry.setUser(null);
