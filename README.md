@@ -4,6 +4,20 @@
 
 Plataforma que conecta viajeros, agencias, hoteles, guías y conductores en un ecosistema completo de turismo.
 
+## 📊 Estado del Proyecto
+
+| Componente | Estado | Progreso |
+|------------|--------|----------|
+| **Backend Core** | ✅ Completo | 11/11 módulos (100%) |
+| **API Docs** | ✅ Completo | 11/11 APIs (100%) |
+| **Endpoints** | ✅ Completo | 169+ endpoints REST |
+| **Swagger/OpenAPI** | ✅ Completo | Documentación interactiva |
+| **Testing** | ⏳ Pendiente | 0% |
+| **Frontend** | ⏳ Pendiente | 0% |
+| **Mobile** | ⏳ Pendiente | 0% |
+
+**Ver detalles:** [PROJECT_SUMMARY.md](./docs/PROJECT_SUMMARY.md) | [PLATFORM_OVERVIEW.md](./docs/PLATFORM_OVERVIEW.md)
+
 ---
 
 ## Qué es Viajero Conectado
@@ -333,20 +347,28 @@ Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
 
 ## Roadmap
 
-### Fase 1 - MVP Colombia (Q1 2025)
-- [x] Arquitectura base
+### Fase 1 - Backend Core (✅ COMPLETADA)
+- [x] Arquitectura base modular NestJS
 - [x] Módulos core (Auth, Users, Experiences, Bookings, Payments)
 - [x] Red social completa (posts, comentarios, likes, follows)
-- [x] Sistema de puntos y gamificación
-- [x] Plataforma publicitaria (Ads)
-- [x] Alianzas B2B con contratos
-- [x] Sistema de notificaciones multi-canal
-- [x] Reseñas y calificaciones
-- [ ] Frontend web básico
-- [ ] App móvil viajero
-- [ ] Integración pagos (Stripe, Mercado Pago)
+- [x] Sistema de puntos y gamificación (5 niveles)
+- [x] Plataforma publicitaria (CPC/CPM)
+- [x] Alianzas B2B con contratos y comisiones
+- [x] Sistema de notificaciones multi-canal (In-App, Email, Push, SMS)
+- [x] Reseñas y calificaciones con moderación
+- [x] Documentación completa de 11 APIs (169+ endpoints)
+- [x] Swagger/OpenAPI interactivo
+- [x] Sistema de seguridad (JWT, RBAC, Rate Limiting)
 
-### Fase 2 - Expansión LATAM (Q2-Q3 2025)
+### Fase 2 - Frontend & Testing (En Progreso)
+- [ ] Tests unitarios backend (Jest)
+- [ ] Tests E2E backend
+- [ ] Frontend web Next.js 14
+- [ ] App móvil React Native
+- [ ] Integración pagos (Stripe, Mercado Pago)
+- [ ] UI/UX Design System
+
+### Fase 3 - Expansión LATAM (Q2-Q3 2025)
 - [ ] Multi-idioma (ES, EN, PT)
 - [ ] Multi-moneda
 - [ ] B2B completo
@@ -354,7 +376,7 @@ Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
 - [ ] Analytics avanzado
 - [ ] Marketing automation
 
-### Fase 3 - Global (Q4 2025+)
+### Fase 4 - Global (Q4 2025+)
 - [ ] Internacionalización completa
 - [ ] Machine Learning (recomendaciones)
 - [ ] API pública para partners
@@ -371,14 +393,27 @@ Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
 - [Arquitectura](./docs/architecture/ARCHITECTURE.md) - Diseño del sistema
 - [Esquema de DB](./docs/architecture/DATABASE_SCHEMA.md) - Estructura de datos
 
-### APIs Documentadas
-- [Social API](./docs/api/SOCIAL_API.md) - Red social de viajes
-- [Points API](./docs/api/POINTS_API.md) - Sistema de puntos y gamificación
-- [Ads API](./docs/api/ADS_API.md) - Plataforma publicitaria
-- [B2B API](./docs/api/B2B_API.md) - Alianzas estratégicas
-- [Notifications API](./docs/api/NOTIFICATIONS_API.md) - Sistema de notificaciones
-- [Reviews API](./docs/api/REVIEWS_API.md) - Reseñas y calificaciones
-- [API Docs](http://localhost:4000/api/docs) - Swagger (desarrollo)
+### APIs Documentadas (100% Completas)
+
+**Core APIs:**
+- [Auth API](./docs/api/AUTH_API.md) - Autenticación JWT y gestión de sesiones (7 endpoints)
+- [Users API](./docs/api/USERS_API.md) - Gestión de usuarios y perfiles (6 endpoints)
+- [Experiences API](./docs/api/EXPERIENCES_API.md) - Marketplace de tours (17 endpoints)
+- [Bookings API](./docs/api/BOOKINGS_API.md) - Sistema de reservas (13 endpoints)
+- [Payments API](./docs/api/PAYMENTS_API.md) - Procesamiento de pagos (9 endpoints)
+
+**Ecosystem APIs:**
+- [Social API](./docs/api/SOCIAL_API.md) - Red social de viajes (20+ endpoints)
+- [Points API](./docs/api/POINTS_API.md) - Sistema de puntos y gamificación (15+ endpoints)
+- [Ads API](./docs/api/ADS_API.md) - Plataforma publicitaria CPC/CPM (23+ endpoints)
+- [B2B API](./docs/api/B2B_API.md) - Alianzas estratégicas (20+ endpoints)
+- [Notifications API](./docs/api/NOTIFICATIONS_API.md) - Notificaciones multi-canal (18+ endpoints)
+- [Reviews API](./docs/api/REVIEWS_API.md) - Reseñas y calificaciones (16+ endpoints)
+
+**Total:** 169+ endpoints REST documentados
+
+**Swagger/OpenAPI:**
+- [API Docs Interactivos](http://localhost:4000/api/docs) - Documentación completa con Try-it-out
 
 ---
 
