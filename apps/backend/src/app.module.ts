@@ -18,6 +18,7 @@ import { ExperiencesModule } from './modules/experiences/experiences.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { SocialModule } from './modules/social/social.module';
+import { PointsModule } from './modules/points/points.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { SocialModule } from './modules/social/social.module';
     BookingsModule,
     PaymentsModule,
     SocialModule,
+    PointsModule,
     // B2BModule,
   ],
   controllers: [AppController],

@@ -7,7 +7,7 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { Gender } from '@viajero-conectado/types';
+import { Gender, BadgeCode } from '@viajero-conectado/types';
 import { User } from './user.entity';
 
 @Entity('user_profiles')
@@ -45,6 +45,19 @@ export class UserProfile {
     nullable: true,
   })
   gender?: Gender;
+
+  // Gamification fields
+  @Column({ type: 'int', default: 0 })
+  currentPoints: number;
+
+  @Column({ type: 'int', default: 0 })
+  totalPointsEarned: number;
+
+  @Column({ type: 'int', default: 1 })
+  currentLevel: number;
+
+  @Column('simple-array', { nullable: true })
+  badges?: BadgeCode[];
 
   @CreateDateColumn()
   createdAt: Date;
