@@ -211,20 +211,22 @@ El proyecto usa una arquitectura **monolito modular** para el backend, preparada
 
 ### Módulos Principales
 
-1. **Auth Module** - Autenticación y autorización
-2. **Users Module** - Gestión de usuarios y perfiles
-3. **Experiences Module** - Tours y experiencias
-4. **Bookings Module** - Sistema de reservas
-5. **Payments Module** - Pagos y splits
-6. **Social Module** - Feed, stories, comentarios
-7. **Chat Module** - Mensajería real-time
-8. **Media Module** - Gestión de multimedia
-9. **Points Module** - Sistema de puntos y niveles
-10. **B2B Module** - Alianzas entre proveedores
-11. **Notifications Module** - Notificaciones push/email
-12. **Search Module** - Búsqueda con Typesense
+1. ✅ **Auth Module** - Autenticación y autorización JWT
+2. ✅ **Users Module** - Gestión de usuarios y perfiles multi-rol
+3. ✅ **Experiences Module** - Tours y experiencias turísticas
+4. ✅ **Bookings Module** - Sistema de reservas con estados completos
+5. ✅ **Payments Module** - Procesamiento de pagos multi-método
+6. ✅ **Social Module** - Red social con posts, comentarios, likes, follows
+7. ✅ **Points Module** - Sistema de puntos y gamificación con 5 niveles
+8. ✅ **Ads Module** - Plataforma publicitaria tipo Facebook Ads (CPC/CPM)
+9. ✅ **B2B Module** - Alianzas estratégicas con contratos y comisiones
+10. ✅ **Notifications Module** - Notificaciones multi-canal (In-App, Email, Push, SMS)
+11. ✅ **Reviews Module** - Reseñas y calificaciones con moderación
+12. ⏳ **Chat Module** - Mensajería real-time (pendiente)
+13. ⏳ **Media Module** - Gestión de multimedia (pendiente)
+14. ⏳ **Search Module** - Búsqueda con Typesense (pendiente)
 
-Ver [docs/architecture/ARCHITECTURE.md](./docs/architecture/ARCHITECTURE.md) para más detalles.
+Ver [docs/PLATFORM_OVERVIEW.md](./docs/PLATFORM_OVERVIEW.md) para documentación completa.
 
 ---
 
@@ -333,12 +335,16 @@ Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
 
 ### Fase 1 - MVP Colombia (Q1 2025)
 - [x] Arquitectura base
-- [ ] Módulos core (Auth, Users, Experiences, Bookings)
+- [x] Módulos core (Auth, Users, Experiences, Bookings, Payments)
+- [x] Red social completa (posts, comentarios, likes, follows)
+- [x] Sistema de puntos y gamificación
+- [x] Plataforma publicitaria (Ads)
+- [x] Alianzas B2B con contratos
+- [x] Sistema de notificaciones multi-canal
+- [x] Reseñas y calificaciones
 - [ ] Frontend web básico
 - [ ] App móvil viajero
 - [ ] Integración pagos (Stripe, Mercado Pago)
-- [ ] Red social básica
-- [ ] Sistema de puntos v1
 
 ### Fase 2 - Expansión LATAM (Q2-Q3 2025)
 - [ ] Multi-idioma (ES, EN, PT)
@@ -359,10 +365,20 @@ Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
 
 ## Documentación
 
-- [Arquitectura](./docs/architecture/ARCHITECTURE.md)
-- [Esquema de DB](./docs/architecture/DATABASE_SCHEMA.md)
-- [Stack Tecnológico](./TECH_STACK.md)
-- [API Docs](http://localhost:4000/api/docs) (desarrollo)
+### General
+- [Resumen de la Plataforma](./docs/PLATFORM_OVERVIEW.md) - Visión general completa
+- [Stack Tecnológico](./TECH_STACK.md) - Tecnologías utilizadas
+- [Arquitectura](./docs/architecture/ARCHITECTURE.md) - Diseño del sistema
+- [Esquema de DB](./docs/architecture/DATABASE_SCHEMA.md) - Estructura de datos
+
+### APIs Documentadas
+- [Social API](./docs/api/SOCIAL_API.md) - Red social de viajes
+- [Points API](./docs/api/POINTS_API.md) - Sistema de puntos y gamificación
+- [Ads API](./docs/api/ADS_API.md) - Plataforma publicitaria
+- [B2B API](./docs/api/B2B_API.md) - Alianzas estratégicas
+- [Notifications API](./docs/api/NOTIFICATIONS_API.md) - Sistema de notificaciones
+- [Reviews API](./docs/api/REVIEWS_API.md) - Reseñas y calificaciones
+- [API Docs](http://localhost:4000/api/docs) - Swagger (desarrollo)
 
 ---
 
