@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import '@/styles/globals.css';
 import { QueryProvider } from '@/providers/query-provider';
 import { WebSocketProvider } from '@/providers/websocket-provider';
+import { ToastProvider } from '@/providers/toast-provider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -39,7 +40,9 @@ export default function RootLayout({
       <body className="antialiased">
         <QueryProvider>
           <WebSocketProvider>
-            {children}
+            <ToastProvider>
+              {children}
+            </ToastProvider>
           </WebSocketProvider>
         </QueryProvider>
       </body>

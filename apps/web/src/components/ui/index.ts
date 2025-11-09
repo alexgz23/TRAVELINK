@@ -12,3 +12,11 @@ export {
   CardContent,
   CardFooter,
 } from './Card';
+export {
+  Skeleton,
+  CardSkeleton,
+  ExperienceCardSkeleton,
+  ListItemSkeleton,
+  TableSkeleton,
+  ProfileSkeleton,
+} from './Skeleton';
