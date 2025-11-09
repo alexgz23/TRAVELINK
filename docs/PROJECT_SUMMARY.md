@@ -482,7 +482,7 @@ El backend ha sido completamente implementado con **11 módulos funcionales**, *
 - [x] Completar documentación de APIs pendientes
 - [ ] Implementar tests unitarios (Jest)
 - [ ] Implementar tests E2E
-- [ ] Agregar Swagger/OpenAPI
+- [x] Agregar Swagger/OpenAPI
 - [ ] Implementar logging con Winston
 - [ ] Agregar monitoring (Sentry)
 - [ ] WebSockets para chat
