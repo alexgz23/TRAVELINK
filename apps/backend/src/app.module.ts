@@ -13,6 +13,7 @@ import { HttpExceptionFilter } from './common/filters';
 // Feature modules
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+import { ExperiencesModule } from './modules/experiences/experiences.module';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { UsersModule } from './modules/users/users.module';
     // Feature modules
     AuthModule,
     UsersModule,
-    // ExperiencesModule,
+    ExperiencesModule,
     // BookingsModule,
     // PaymentsModule,
     // SocialModule,
