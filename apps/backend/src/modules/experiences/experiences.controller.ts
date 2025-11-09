@@ -22,7 +22,8 @@ import {
   CreateItineraryDto,
 } from './dto';
 import { JwtAuthGuard, RolesGuard } from '@/common/guards';
-import { Public, Roles, CurrentUser } from '@/common/decorators';
+import { Public, Roles, CurrentUser, CacheKey, CacheTTL } from '@/common/decorators';
+import { CacheInterceptor } from '@/common/interceptors/cache.interceptor';
 import { UserRole } from '@viajero-conectado/types';
 import { User } from '@/modules/users/entities';
 
@@ -35,6 +36,9 @@ export class ExperiencesController {
 
   @Public()
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('experiences:list')
+  @CacheTTL(300) // 5 minutos
   @ApiOperation({ summary: 'Listar experiencias con filtros' })
   @ApiResponse({ status: 200, description: 'Lista de experiencias' })
   findAll(@Query() filters: FilterExperienceDto) {
@@ -43,6 +47,9 @@ export class ExperiencesController {
 
   @Public()
   @Get('slug/:slug')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('experience:slug:{slug}')
+  @CacheTTL(600) // 10 minutos
   @ApiOperation({ summary: 'Obtener experiencia por slug' })
   @ApiResponse({ status: 200, description: 'Experiencia encontrada' })
   @ApiResponse({ status: 404, description: 'Experiencia no encontrada' })
@@ -52,6 +59,9 @@ export class ExperiencesController {
 
   @Public()
   @Get(':id')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('experience:{id}')
+  @CacheTTL(600) // 10 minutos
   @ApiOperation({ summary: 'Obtener experiencia por ID' })
   @ApiResponse({ status: 200, description: 'Experiencia encontrada' })
   @ApiResponse({ status: 404, description: 'Experiencia no encontrada' })

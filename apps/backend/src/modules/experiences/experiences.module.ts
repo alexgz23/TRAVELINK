@@ -8,10 +8,12 @@ import {
   ExperienceMedia,
   ExperienceItinerary,
 } from './entities';
+import { CacheServiceModule } from '@/common/cache/cache.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Experience, ExperienceVariant, ExperienceMedia, ExperienceItinerary]),
+    CacheServiceModule,
   ],
   controllers: [ExperiencesController],
   providers: [ExperiencesService],

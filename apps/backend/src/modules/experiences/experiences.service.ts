@@ -23,6 +23,7 @@ import {
 import { ExperienceStatus } from '@viajero-conectado/types';
 import { slugify } from '@viajero-conectado/shared';
 import { LoggerService } from '@/common/logger/logger.service';
+import { CacheService } from '@/common/cache/cache.service';
 
 @Injectable()
 export class ExperiencesService {
@@ -36,6 +37,7 @@ export class ExperiencesService {
     @InjectRepository(ExperienceItinerary)
     private readonly itineraryRepository: Repository<ExperienceItinerary>,
     private readonly logger: LoggerService,
+    private readonly cacheService: CacheService,
   ) {
     this.logger.setContext('ExperiencesService');
   }
@@ -259,6 +261,9 @@ export class ExperiencesService {
       userId,
       fields: Object.keys(updateDto),
     });
+
+    // Invalidar cache
+    await this.cacheService.invalidateExperienceCache(id);
 
     return updated;
   }

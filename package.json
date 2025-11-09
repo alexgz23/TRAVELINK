@@ -32,5 +32,11 @@
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
   },
-  "packageManager": "pnpm@8.10.0"
+  "packageManager": "pnpm@8.10.0",
+  "dependencies": {
+    "@nestjs/cache-manager": "^3.0.1",
+    "cache-manager": "^7.2.4",
+    "cache-manager-redis-yet": "^5.1.5",
+    "redis": "^5.9.0"
+  }
 }
