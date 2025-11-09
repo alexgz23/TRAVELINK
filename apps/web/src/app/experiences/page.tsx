@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { MainLayout } from '@/components/layout';
 import { Button, Card, CardContent, Input } from '@/components/ui';
+import { useExperiences } from '@/hooks';
 import { ROUTES, EXPERIENCE_CATEGORIES } from '@/lib/constants';
+import { formatCurrency } from '@/lib/utils';
 
 export default function ExperiencesPage() {
   const [searchQuery, setSearchQuery] = useState('');
