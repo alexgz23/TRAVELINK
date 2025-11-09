@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD, APP_FILTER } from '@nestjs/core';
 
@@ -16,6 +17,7 @@ import { UsersModule } from './modules/users/users.module';
 import { ExperiencesModule } from './modules/experiences/experiences.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { SocialModule } from './modules/social/social.module';
 
 @Module({
   imports: [
@@ -29,6 +31,14 @@ import { PaymentsModule } from './modules/payments/payments.module';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => getTypeOrmConfig(configService),
+    }),
+
+    // Database - MongoDB
+    MongooseModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get('MONGODB_URI') || 'mongodb://localhost:27017/viajero-conectado',
+      }),
     }),
 
     // Rate limiting
@@ -45,7 +55,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
     ExperiencesModule,
     BookingsModule,
     PaymentsModule,
-    // SocialModule,
+    SocialModule,
     // B2BModule,
   ],
   controllers: [AppController],
