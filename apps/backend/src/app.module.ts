@@ -15,6 +15,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ExperiencesModule } from './modules/experiences/experiences.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 
 @Module({
   imports: [
@@ -43,7 +44,7 @@ import { BookingsModule } from './modules/bookings/bookings.module';
     UsersModule,
     ExperiencesModule,
     BookingsModule,
-    // PaymentsModule,
+    PaymentsModule,
     // SocialModule,
     // B2BModule,
   ],
