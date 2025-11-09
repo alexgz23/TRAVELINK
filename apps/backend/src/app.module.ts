@@ -1,10 +1,18 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD, APP_FILTER } from '@nestjs/core';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { getTypeOrmConfig } from './config/typeorm.config';
+import { JwtAuthGuard, RolesGuard } from './common/guards';
+import { HttpExceptionFilter } from './common/filters';
+
+// Feature modules
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -15,36 +23,45 @@ import { AppService } from './app.service';
     }),
 
     // Database - PostgreSQL
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
-      username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_NAME || 'viajero_conectado',
-      autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV !== 'production', // Solo en desarrollo
-      logging: process.env.NODE_ENV === 'development',
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => getTypeOrmConfig(configService),
     }),
 
     // Rate limiting
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 1 minuto
-        limit: 10, // 10 requests
+        limit: 100, // 100 requests
       },
     ]),
 
-    // Modules
-    // TODO: Import feature modules here
-    // AuthModule,
-    // UsersModule,
+    // Feature modules
+    AuthModule,
+    UsersModule,
     // ExperiencesModule,
     // BookingsModule,
+    // PaymentsModule,
     // SocialModule,
     // B2BModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    // Global guards
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    // Global filters
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}
