@@ -22,6 +22,7 @@ import { PointsModule } from './modules/points/points.module';
 import { AdsModule } from './modules/ads/ads.module';
 import { B2BModule } from './modules/b2b/b2b.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     AdsModule,
     B2BModule,
     NotificationsModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [
