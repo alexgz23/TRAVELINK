@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import '@/styles/globals.css';
 import { QueryProvider } from '@/providers/query-provider';
+import { WebSocketProvider } from '@/providers/websocket-provider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -37,7 +38,9 @@ export default function RootLayout({
     <html lang="es" className={inter.variable}>
       <body className="antialiased">
         <QueryProvider>
-          {children}
+          <WebSocketProvider>
+            {children}
+          </WebSocketProvider>
         </QueryProvider>
       </body>
     </html>
