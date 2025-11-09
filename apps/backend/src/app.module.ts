@@ -19,6 +19,7 @@ import { BookingsModule } from './modules/bookings/bookings.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { SocialModule } from './modules/social/social.module';
 import { PointsModule } from './modules/points/points.module';
+import { AdsModule } from './modules/ads/ads.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { PointsModule } from './modules/points/points.module';
     PaymentsModule,
     SocialModule,
     PointsModule,
+    AdsModule,
     // B2BModule,
   ],
   controllers: [AppController],

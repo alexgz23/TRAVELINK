@@ -5,3 +5,4 @@ export * from './experience.enum';
 export * from './payment.enum';
 export * from './social.enum';
 export * from './points.enum';
+export * from './ads.enum';
