@@ -1,0 +1,199 @@
+name: CD - Continuous Deployment
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/backend
+
+jobs:
+  # Job 1: Build and Push Docker Image
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          platforms: linux/amd64
+
+  # Job 2: Deploy to Staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'staging'
+    environment:
+      name: staging
+      url: https://staging.viajeroconectado.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Staging
+        run: |
+          echo "🚀 Deploying to staging environment..."
+          echo "Image: ${{ needs.build-and-push.outputs.image-tag }}"
+          # TODO: Add deployment steps for staging
+          # Example: SSH to server and run docker-compose pull && docker-compose up -d
+          # Or use kubectl for Kubernetes deployment
+          # Or trigger deployment via API to cloud provider
+
+      - name: Run Database Migrations
+        run: |
+          echo "📦 Running database migrations..."
+          # TODO: Add migration commands
+          # Example: docker exec backend pnpm run migration:run
+
+      - name: Health Check
+        run: |
+          echo "🏥 Checking application health..."
+          # TODO: Add health check verification
+          # Example: curl -f https://staging.viajeroconectado.com/api/v1/health
+
+      - name: Notify Deployment Success
+        if: success()
+        run: |
+          echo "✅ Deployment to staging successful!"
+          # TODO: Add notification (Slack, Discord, Email)
+
+      - name: Notify Deployment Failure
+        if: failure()
+        run: |
+          echo "❌ Deployment to staging failed!"
+          # TODO: Add notification (Slack, Discord, Email)
+
+  # Job 3: Deploy to Production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://viajeroconectado.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Production
+        run: |
+          echo "🚀 Deploying to production environment..."
+          echo "Image: ${{ needs.build-and-push.outputs.image-tag }}"
+          # TODO: Add deployment steps for production
+          # Example: SSH to server and run docker-compose pull && docker-compose up -d
+          # Or use kubectl for Kubernetes deployment
+          # Or trigger deployment via API to cloud provider
+
+      - name: Run Database Migrations
+        run: |
+          echo "📦 Running database migrations..."
+          # TODO: Add migration commands
+          # Example: docker exec backend pnpm run migration:run
+
+      - name: Health Check
+        run: |
+          echo "🏥 Checking application health..."
+          # TODO: Add health check verification
+          # Example: curl -f https://viajeroconectado.com/api/v1/health
+
+      - name: Create Sentry Release
+        if: success()
+        run: |
+          echo "📊 Creating Sentry release..."
+          # TODO: Create Sentry release for error tracking
+          # Example: sentry-cli releases new ${{ github.ref_name }}
+
+      - name: Notify Deployment Success
+        if: success()
+        run: |
+          echo "✅ Deployment to production successful!"
+          # TODO: Add notification (Slack, Discord, Email)
+
+      - name: Notify Deployment Failure
+        if: failure()
+        run: |
+          echo "❌ Deployment to production failed!"
+          # TODO: Add notification (Slack, Discord, Email)
+
+  # Job 4: Rollback (Manual Trigger)
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    environment:
+      name: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Rollback to Previous Version
+        run: |
+          echo "⏪ Rolling back to previous version..."
+          # TODO: Add rollback steps
+          # Example: docker-compose down && docker-compose up -d <previous-image>
+          # Or use kubectl rollout undo
+
+      - name: Notify Rollback
+        run: |
+          echo "🔄 Rollback completed"
+          # TODO: Add notification (Slack, Discord, Email)
