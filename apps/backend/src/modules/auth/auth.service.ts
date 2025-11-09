@@ -57,7 +57,7 @@ export class AuthService {
     }
 
     // Verificar contraseña
-    const isPasswordValid = await this.comparePassword(loginDto.password, user.passwordHash);
+    const isPasswordValid = await this.comparePassword(loginDto.password, user.passwordHash!);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credenciales inválidas');
@@ -176,7 +176,7 @@ export class AuthService {
     }
 
     // Verificar contraseña actual
-    const isPasswordValid = await this.comparePassword(currentPassword, user.passwordHash);
+    const isPasswordValid = await this.comparePassword(currentPassword, user.passwordHash!);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Contraseña actual incorrecta');
     }

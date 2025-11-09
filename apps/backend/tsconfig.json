@@ -20,7 +20,9 @@
     "paths": {
       "@/*": ["src/*"],
       "@shared/*": ["../../packages/shared/src/*"],
-      "@types/*": ["../../packages/types/src/*"]
+      "@types/*": ["../../packages/types/src/*"],
+      "@viajero-conectado/types": ["../../packages/types/src"],
+      "@viajero-conectado/shared": ["../../packages/shared/src"]
     }
   },
   "include": ["src/**/*"],

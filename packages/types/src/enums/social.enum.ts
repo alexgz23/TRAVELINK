@@ -38,21 +38,3 @@ export enum ReactionType {
   USEFUL = 'useful',
   WOW = 'wow',
 }
-
-/**
- * Tipos de notificación
- */
-export enum NotificationType {
-  NEW_FOLLOWER = 'new_follower',
-  POST_LIKE = 'post_like',
-  POST_COMMENT = 'post_comment',
-  COMMENT_REPLY = 'comment_reply',
-  MENTION = 'mention',
-  BOOKING_CONFIRMED = 'booking_confirmed',
-  BOOKING_CANCELLED = 'booking_cancelled',
-  POINTS_EARNED = 'points_earned',
-  LEVEL_UP = 'level_up',
-  BADGE_UNLOCKED = 'badge_unlocked',
-  MESSAGE = 'message',
-  REVIEW_RECEIVED = 'review_received',
-}
