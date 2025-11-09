@@ -4,6 +4,8 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import compression from 'compression';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { getQueueToken } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 import { AppModule } from './app.module';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -11,6 +13,8 @@ import { SentryInterceptor } from './common/interceptors/sentry.interceptor';
 import { SentryExceptionFilter } from './common/filters/sentry-exception.filter';
 import { LoggerService } from './common/logger/logger.service';
 import { initializeSentry, closeSentry } from './common/sentry/sentry.config';
+import { setupBullBoard } from './queues/bull-board.config';
+import { QueueName } from './queues/constants';
 
 async function bootstrap() {
   // Inicializar Sentry antes de crear la aplicación
@@ -124,6 +128,15 @@ async function bootstrap() {
     });
   }
 
+  // Setup Bull Board for queue monitoring (solo en desarrollo)
+  if (process.env.NODE_ENV !== 'production') {
+    const emailQueue = app.get<Queue>(getQueueToken(QueueName.EMAIL));
+    const notificationsQueue = app.get<Queue>(getQueueToken(QueueName.NOTIFICATIONS));
+
+    const serverAdapter = setupBullBoard([emailQueue, notificationsQueue]);
+    app.use('/admin/queues', serverAdapter.getRouter());
+  }
+
   // Start server
   await app.listen(port);
 
@@ -133,6 +146,9 @@ async function bootstrap() {
   logger.log(`🔒 CORS enabled for: ${process.env.CORS_ORIGIN || 'http://localhost:3000'}`);
   if (process.env.SENTRY_DSN) {
     logger.log(`📊 Sentry monitoring enabled`);
+  }
+  if (process.env.NODE_ENV !== 'production') {
+    logger.log(`📋 Bull Board (Queues): http://localhost:${port}/admin/queues`);
   }
 
   // Graceful shutdown

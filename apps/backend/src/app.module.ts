@@ -4,17 +4,21 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CacheModule } from '@nestjs/cache-manager';
+import { BullModule } from '@nestjs/bull';
 import { APP_GUARD, APP_FILTER } from '@nestjs/core';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { getTypeOrmConfig } from './config/typeorm.config';
 import { redisConfig } from './config/redis.config';
+import { bullConfig } from './config/bull.config';
 import { JwtAuthGuard, RolesGuard } from './common/guards';
 import { HttpExceptionFilter } from './common/filters';
 import { LoggerModule } from './common/logger/logger.module';
 import { CacheServiceModule } from './common/cache/cache.module';
 import { HealthModule } from './health/health.module';
+import { EmailQueueModule } from './queues/email/email-queue.module';
+import { NotificationsQueueModule } from './queues/notifications/notifications-queue.module';
 
 // Feature modules
 import { AuthModule } from './modules/auth/auth.module';
@@ -55,6 +59,12 @@ import { ChatModule } from './modules/chat/chat.module';
     // Cache - Redis
     CacheModule.registerAsync(redisConfig),
 
+    // Queues - Bull
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: bullConfig,
+    }),
+
     // Rate limiting
     ThrottlerModule.forRoot([
       {
@@ -71,6 +81,10 @@ import { ChatModule } from './modules/chat/chat.module';
 
     // Health check
     HealthModule,
+
+    // Queue modules
+    EmailQueueModule,
+    NotificationsQueueModule,
 
     // Feature modules
     AuthModule,
