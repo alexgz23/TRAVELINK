@@ -33,6 +33,7 @@ import { B2BModule } from './modules/b2b/b2b.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -99,6 +100,7 @@ import { ChatModule } from './modules/chat/chat.module';
     NotificationsModule,
     ReviewsModule,
     ChatModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [

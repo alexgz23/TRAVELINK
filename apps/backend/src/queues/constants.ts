@@ -26,6 +26,7 @@ export const JobName = {
   NOTIFICATION_SMS: 'notification:sms',
 
   // Image processing jobs
+  IMAGE_PROCESS: 'image:process', // Main job for processing uploaded images
   IMAGE_RESIZE: 'image:resize',
   IMAGE_OPTIMIZE: 'image:optimize',
   IMAGE_THUMBNAIL: 'image:thumbnail',
