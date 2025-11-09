@@ -491,9 +491,9 @@ El backend ha sido completamente implementado con **11 módulos funcionales**, *
 
 ### DevOps
 
-- [ ] Dockerfiles completos
-- [ ] docker-compose.yml
-- [ ] Variables de entorno por ambiente
+- [x] Dockerfiles completos
+- [x] docker-compose.yml
+- [x] Variables de entorno por ambiente
 - [ ] CI/CD con GitHub Actions
 - [ ] Deploy a staging
 - [ ] Deploy a producción
