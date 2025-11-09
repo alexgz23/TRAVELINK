@@ -1,0 +1,32 @@
+# robots.txt for Viajero Conectado
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow sensitive pages
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /booking/*/payment
+Disallow: /auth/
+
+# Allow specific bots
+User-agent: Googlebot
+Allow: /
+Allow: /experiences/
+Allow: /social/
+
+User-agent: Bingbot
+Allow: /
+Allow: /experiences/
+Allow: /social/
+
+# Crawl-delay for all bots (1 second)
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://viajeroconectado.com/sitemap.xml
+Sitemap: https://viajeroconectado.com/sitemap-experiences.xml
+Sitemap: https://viajeroconectado.com/sitemap-pages.xml
