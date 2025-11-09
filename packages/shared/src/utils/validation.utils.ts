@@ -1,13 +1,6 @@
 import { REGEX_PATTERNS } from '../constants';
 
 /**
- * Valida formato de email
- */
-export function isValidEmail(email: string): boolean {
-  return REGEX_PATTERNS.EMAIL.test(email);
-}
-
-/**
  * Valida formato de teléfono internacional
  */
 export function isValidPhone(phone: string): boolean {
