@@ -34,6 +34,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { MediaModule } from './media/media.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -101,6 +102,7 @@ import { MediaModule } from './media/media.module';
     ReviewsModule,
     ChatModule,
     MediaModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [
