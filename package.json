@@ -1,15 +1,23 @@
 {
-  "name": "viajero-conectado-web",
+  "name": "viajero-conectado",
   "version": "0.1.0",
   "private": true,
-  "description": "Viajero Conectado - Red social + marketplace de viajes (Frontend Web)",
+  "description": "Viajero Conectado - Red social + marketplace de viajes (Full Stack)",
   "scripts": {
-    "dev": "cd apps/web && pnpm dev",
-    "build": "cd apps/web && pnpm build",
-    "start": "cd apps/web && pnpm start",
-    "lint": "cd apps/web && pnpm lint",
-    "test": "cd apps/web && pnpm test",
-    "install:web": "cd apps/web && pnpm install"
+    "install:all": "pnpm install && cd apps/web && pnpm install && cd ../backend && pnpm install",
+    "dev:web": "cd apps/web && pnpm dev",
+    "dev:backend": "cd apps/backend && pnpm dev",
+    "build:web": "cd apps/web && pnpm build",
+    "build:backend": "cd apps/backend && pnpm build",
+    "start:web": "cd apps/web && pnpm start",
+    "start:backend": "cd apps/backend && pnpm start:prod",
+    "lint": "cd apps/web && pnpm lint && cd ../backend && pnpm lint",
+    "test": "cd apps/web && pnpm test && cd ../backend && pnpm test",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "prisma:studio": "cd apps/backend && pnpm prisma:studio",
+    "prisma:migrate": "cd apps/backend && pnpm prisma:migrate"
   },
   "engines": {
     "node": ">=18.0.0",
