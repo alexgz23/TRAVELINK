@@ -4,7 +4,18 @@ Backend API construido con NestJS, Prisma y PostgreSQL.
 
 ## 🚀 Inicio Rápido
 
-### 1. Instalar PostgreSQL
+### Opción A: Setup Automático (Recomendado)
+
+```bash
+cd apps/backend
+./quick-start.sh
+```
+
+El script te guiará por todo el proceso de configuración automáticamente.
+
+### Opción B: Setup Manual
+
+#### 1. Instalar PostgreSQL
 
 Necesitas tener PostgreSQL instalado y corriendo.
 
@@ -169,6 +180,33 @@ pnpm prisma:migrate     # Ejecutar migraciones
 pnpm prisma:studio      # UI de base de datos
 pnpm db:reset           # Resetear base de datos (⚠️ borra todo)
 ```
+
+## 🛠️ Setup & Verification Scripts
+
+### Quick Start Script
+```bash
+./quick-start.sh
+```
+Automated setup that:
+- Installs dependencies
+- Checks .env configuration
+- Generates Prisma client
+- Runs database migrations
+- Verifies setup is complete
+
+### Setup Verification
+```bash
+./verify-setup.sh
+```
+Checks your environment:
+- Node.js and pnpm versions
+- Dependencies installation
+- Environment variables
+- Database connection
+- Prisma client generation
+- TypeScript compilation
+
+Use this to troubleshoot issues or verify your setup is correct.
 
 ## 🔐 Autenticación
 
