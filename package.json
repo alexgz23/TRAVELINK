@@ -13,9 +13,6 @@
     "start:backend": "cd apps/backend && pnpm start:prod",
     "lint": "cd apps/web && pnpm lint && cd ../backend && pnpm lint",
     "test": "cd apps/web && pnpm test && cd ../backend && pnpm test",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f",
     "prisma:studio": "cd apps/backend && pnpm prisma:studio",
     "prisma:migrate": "cd apps/backend && pnpm prisma:migrate"
   },

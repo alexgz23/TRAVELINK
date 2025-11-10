@@ -4,32 +4,67 @@ Backend API construido con NestJS, Prisma y PostgreSQL.
 
 ## 🚀 Inicio Rápido
 
-### 1. Instalar dependencias
+### 1. Instalar PostgreSQL
+
+Necesitas tener PostgreSQL instalado y corriendo.
+
+**macOS:**
+```bash
+brew install postgresql@15
+brew services start postgresql@15
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
+```
+
+**Windows:**
+Descargar desde https://www.postgresql.org/download/windows/
+
+**Alternativa - PostgreSQL Cloud (Gratis):**
+- **Supabase:** https://supabase.com
+- **Neon:** https://neon.tech
+- **Railway:** https://railway.app
+
+### 2. Crear base de datos
+
+```bash
+# Conectar a PostgreSQL
+psql -U postgres
+
+# Crear base de datos
+CREATE DATABASE viajero_conectado;
+
+# (Opcional) Crear usuario
+CREATE USER viajero_user WITH PASSWORD 'tu_password';
+GRANT ALL PRIVILEGES ON DATABASE viajero_conectado TO viajero_user;
+
+# Salir
+\q
+```
+
+### 3. Instalar dependencias
 
 ```bash
 cd apps/backend
 pnpm install
 ```
 
-### 2. Iniciar servicios de base de datos
-
-Desde la raíz del proyecto:
+### 4. Configurar variables de entorno
 
 ```bash
-docker-compose up -d
+cp .env.example .env
 ```
 
-Esto iniciará:
-- PostgreSQL en puerto `5432`
-- Redis en puerto `6379`
-- Adminer (DB UI) en `http://localhost:8080`
-- Redis Commander en `http://localhost:8081`
+Editar `.env` con tu conexión PostgreSQL:
 
-### 3. Configurar variables de entorno
+```env
+DATABASE_URL="postgresql://postgres:password@localhost:5432/viajero_conectado?schema=public"
+```
 
-El archivo `.env` ya está creado con valores de desarrollo. Puedes editarlo según necesites.
-
-### 4. Ejecutar migraciones de Prisma
+### 5. Ejecutar migraciones
 
 ```bash
 # Generar cliente de Prisma
@@ -42,7 +77,7 @@ pnpm prisma:migrate
 pnpm prisma:studio
 ```
 
-### 5. Iniciar servidor de desarrollo
+### 6. Iniciar servidor de desarrollo
 
 ```bash
 pnpm dev
@@ -77,22 +112,22 @@ Una vez el servidor esté corriendo, accede a la documentación interactiva de S
 - `PUT /api/v1/experiences/:id` - Actualizar experiencia
 - `DELETE /api/v1/experiences/:id` - Eliminar experiencia
 
-### Bookings
+### Bookings (🟡 Pendiente)
 - `GET /api/v1/bookings` - Mis reservas
 - `POST /api/v1/bookings` - Crear reserva
 
-### Reviews
+### Reviews (🟡 Pendiente)
 - `GET /api/v1/reviews` - Listar reseñas
 - `POST /api/v1/reviews` - Crear reseña
 
-### Posts (Social Feed)
+### Posts (🟡 Pendiente)
 - `GET /api/v1/posts` - Feed de posts
 - `POST /api/v1/posts` - Crear post
 
-### Chat
+### Chat (🟡 Pendiente)
 - WebSocket en `/` para mensajería en tiempo real
 
-### Uploads
+### Uploads (🟡 Pendiente)
 - `POST /api/v1/uploads/image` - Subir imagen
 
 ## 🗄️ Estructura de Base de Datos
@@ -153,24 +188,8 @@ Principales:
 - `DATABASE_URL` - URL de PostgreSQL
 - `JWT_SECRET` - Secret para access token
 - `JWT_REFRESH_SECRET` - Secret para refresh token
-
-## 🐳 Docker
-
-### Solo base de datos:
-```bash
-docker-compose up -d
-```
-
-### Todo (backend + DB):
-```bash
-# TO DO: Agregar Dockerfile para backend
-```
-
-## 📊 Monitoreo
-
-- **Adminer**: http://localhost:8080 (User: postgres, Pass: postgres)
-- **Redis Commander**: http://localhost:8081
-- **Prisma Studio**: `pnpm prisma:studio`
+- `REDIS_HOST` - Host de Redis (opcional)
+- `REDIS_PORT` - Puerto de Redis (opcional)
 
 ## 🚧 Estado del Proyecto
 
@@ -180,7 +199,6 @@ docker-compose up -d
 - Módulo de Users
 - Módulo de Experiences (CRUD)
 - Schema de Prisma completo
-- Docker Compose para desarrollo
 - Documentación Swagger
 
 ### 🚧 En Desarrollo / Pendiente
@@ -213,7 +231,6 @@ docker-compose up -d
    - Coverage > 80%
 
 4. **Deploy**
-   - Dockerfile
    - Deploy en Railway/Render
    - CI/CD con GitHub Actions
 

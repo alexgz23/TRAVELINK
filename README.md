@@ -58,7 +58,6 @@ TRAVELINK/
 │       │   └── schema.prisma  # Schema de base de datos
 │       └── package.json
 │
-├── docker-compose.yml    # PostgreSQL + Redis
 ├── package.json
 └── README.md
 ```
@@ -71,7 +70,8 @@ TRAVELINK/
 
 - **Node.js** 18+ ([Descargar](https://nodejs.org/))
 - **pnpm** 8+ (`npm install -g pnpm`)
-- **Docker Desktop** ([Descargar](https://www.docker.com/products/docker-desktop))
+- **PostgreSQL** 15+ ([Descargar](https://www.postgresql.org/download/))
+- **Redis** 7+ (Opcional) ([Descargar](https://redis.io/download))
 
 ### 1. Clonar repositorio
 
@@ -80,17 +80,45 @@ git clone <tu-repo-url>
 cd TRAVELINK
 ```
 
-### 2. Iniciar servicios de base de datos
+### 2. Configurar PostgreSQL
+
+**Opción A - Instalación local:**
 
 ```bash
-docker-compose up -d
+# macOS
+brew install postgresql@15
+brew services start postgresql@15
+
+# Ubuntu/Debian
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
+
+# Windows
+# Descargar instalador desde https://www.postgresql.org/download/windows/
 ```
 
-Esto iniciará:
-- **PostgreSQL** en puerto `5432`
-- **Redis** en puerto `6379`
-- **Adminer** (DB UI) en `http://localhost:8080`
-- **Redis Commander** en `http://localhost:8081`
+**Crear base de datos:**
+
+```bash
+# Conectar a PostgreSQL
+psql -U postgres
+
+# Crear base de datos
+CREATE DATABASE viajero_conectado;
+
+# Crear usuario (opcional)
+CREATE USER viajero_user WITH PASSWORD 'tu_password';
+GRANT ALL PRIVILEGES ON DATABASE viajero_conectado TO viajero_user;
+
+# Salir
+\q
+```
+
+**Opción B - PostgreSQL cloud gratuito:**
+
+- **Supabase:** https://supabase.com (gratis hasta 500MB)
+- **Railway:** https://railway.app (gratis con límites)
+- **Neon:** https://neon.tech ($0 para desarrollo)
 
 ### 3. Configurar Backend
 
@@ -99,6 +127,12 @@ cd apps/backend
 
 # Instalar dependencias
 pnpm install
+
+# Configurar variables de entorno
+cp .env.example .env
+
+# Editar .env con tu conexión PostgreSQL
+# DATABASE_URL="postgresql://postgres:password@localhost:5432/viajero_conectado?schema=public"
 
 # Generar cliente Prisma
 pnpm prisma:generate
@@ -120,6 +154,9 @@ pnpm install
 
 # Copiar variables de entorno
 cp .env.example .env.local
+
+# Editar .env.local
+# NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
 ```
 
 ### 5. Iniciar aplicaciones
@@ -161,13 +198,12 @@ pnpm dev
 - **Lenguaje:** TypeScript 5
 - **ORM:** Prisma
 - **Base de datos:** PostgreSQL 15
-- **Caché:** Redis 7
+- **Caché:** Redis 7 (opcional)
 - **Auth:** JWT + Passport
 - **Validación:** class-validator
 - **Docs:** Swagger/OpenAPI
 
 ### DevOps
-- **Containers:** Docker + Docker Compose
 - **Package Manager:** pnpm
 - **Version Control:** Git
 
@@ -277,16 +313,27 @@ pnpm test:cov
 ### Raíz del Proyecto
 ```bash
 # Instalar todas las dependencias
-pnpm install
+pnpm install:all
 
-# Desarrollo (ambos servidores)
-pnpm dev
+# Desarrollo
+pnpm dev:web           # Solo frontend
+pnpm dev:backend       # Solo backend
 
-# Build (ambos proyectos)
-pnpm build
+# Build
+pnpm build:web
+pnpm build:backend
 
-# Linting
+# Producción
+pnpm start:web
+pnpm start:backend
+
+# Testing y linting
 pnpm lint
+pnpm test
+
+# Prisma
+pnpm prisma:studio
+pnpm prisma:migrate
 ```
 
 ### Frontend (`apps/web/`)
@@ -312,40 +359,6 @@ pnpm prisma:studio    # DB UI
 
 ---
 
-## 🐳 Docker
-
-### Servicios Disponibles
-
-```bash
-# Iniciar servicios
-docker-compose up -d
-
-# Ver logs
-docker-compose logs -f
-
-# Ver estado
-docker-compose ps
-
-# Detener servicios
-docker-compose down
-
-# Detener y eliminar volúmenes
-docker-compose down -v
-```
-
-### Acceder a UIs
-
-- **Adminer (PostgreSQL):** http://localhost:8080
-  - Sistema: PostgreSQL
-  - Servidor: postgres
-  - Usuario: postgres
-  - Contraseña: postgres
-  - Base de datos: viajero_conectado
-
-- **Redis Commander:** http://localhost:8081
-
----
-
 ## 🔐 Variables de Entorno
 
 ### Frontend (`.env.local`)
@@ -362,9 +375,19 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```env
 NODE_ENV=development
 PORT=4000
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/viajero_conectado?schema=public"
+
+# PostgreSQL
+DATABASE_URL="postgresql://postgres:password@localhost:5432/viajero_conectado?schema=public"
+
+# Redis (opcional)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# JWT
 JWT_SECRET=your-secret-key-change-in-production
 JWT_REFRESH_SECRET=your-refresh-secret-key
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_EXPIRES_IN=30d
 ```
 
 **Ver:** `apps/backend/.env.example` para todas las variables
@@ -381,7 +404,6 @@ JWT_REFRESH_SECRET=your-refresh-secret-key
 - [x] Sistema de autenticación JWT
 - [x] CRUD de usuarios
 - [x] CRUD de experiencias
-- [x] Docker Compose para desarrollo
 - [x] Documentación Swagger
 
 ### 🔄 En Desarrollo
@@ -416,15 +438,21 @@ JWT_REFRESH_SECRET=your-refresh-secret-key
 
 ## 🐛 Troubleshooting
 
-### Docker no inicia
+### PostgreSQL no conecta
 
 ```bash
-# Verificar Docker Desktop está corriendo
-docker --version
+# Verificar que PostgreSQL está corriendo
+# macOS
+brew services list
 
-# Reiniciar servicios
-docker-compose down
-docker-compose up -d
+# Linux
+sudo systemctl status postgresql
+
+# Probar conexión
+psql -U postgres -d viajero_conectado
+
+# Si hay problemas de autenticación, editar pg_hba.conf
+# Cambiar método de "peer" a "md5"
 ```
 
 ### Puerto ya en uso
@@ -454,8 +482,34 @@ pnpm db:reset
 ```bash
 # Eliminar node_modules y reinstalar
 rm -rf node_modules apps/*/node_modules
-pnpm install
+pnpm install:all
 ```
+
+---
+
+## 💡 Servicios de Base de Datos Recomendados
+
+### PostgreSQL Cloud (Gratis para desarrollo)
+
+1. **Supabase** (Recomendado)
+   - URL: https://supabase.com
+   - Tier gratuito: 500MB, 2GB de transferencia
+   - Incluye: PostgreSQL + UI + Storage + Auth
+
+2. **Neon**
+   - URL: https://neon.tech
+   - Tier gratuito: Proyectos ilimitados
+   - Serverless PostgreSQL
+
+3. **Railway**
+   - URL: https://railway.app
+   - Tier gratuito: $5/mes de créditos
+   - Deploy fácil
+
+### Redis Cloud (Opcional)
+
+- **Upstash:** https://upstash.com (gratis 10k comandos/día)
+- **Redis Cloud:** https://redis.com/try-free/ (30MB gratis)
 
 ---
 
