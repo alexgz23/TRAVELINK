@@ -153,22 +153,18 @@ model Experience {
 enum BookingStatus {
   PENDING
   CONFIRMED
-  CANCELLED
+  IN_PROGRESS
   COMPLETED
+  CANCELLED
+  REJECTED
 }
 
 enum PaymentStatus {
   PENDING
+  PARTIAL
   PAID
   REFUNDED
   FAILED
-}
-
-enum PaymentMethod {
-  CARD
-  CASH
-  TRANSFER
-  POINTS
 }
 
 model Booking {
@@ -183,10 +179,16 @@ model Booking {
   user             User           @relation(fields: [userId], references: [id])
 
   // Booking Details
-  date             DateTime
+  startDate        DateTime
+  endDate          DateTime?      // For multi-day experiences
   numberOfPeople   Int
+
+  // Pricing
   totalPrice       Decimal        @db.Decimal(10, 2)
+  commission       Decimal        @db.Decimal(10, 2) @default(0) // Platform commission
+  netPrice         Decimal        @db.Decimal(10, 2) // Price for provider
   pointsUsed       Int            @default(0)
+  pointsValue      Decimal        @db.Decimal(10, 2) @default(0)
 
   // Contact Info
   contactName      String
@@ -197,12 +199,22 @@ model Booking {
   // Status
   status           BookingStatus  @default(PENDING)
   paymentStatus    PaymentStatus  @default(PENDING)
-  paymentMethod    PaymentMethod?
 
-  // Payment Info
-  stripePaymentId  String?
+  // Provider Notes
+  providerNotes    String?        @db.Text
+
+  // Cancellation
+  cancelledAt      DateTime?
+  cancelledBy      String?        // userId who cancelled
+  cancellationReason String?      @db.Text
+  refundAmount     Decimal?       @db.Decimal(10, 2)
+
+  // Documents
+  voucherUrl       String?
+  documentsUrls    String[]       // PDF tickets, confirmations, etc.
 
   // Relations
+  payments         Payment[]
   review           Review?
 
   createdAt        DateTime       @default(now())
@@ -211,7 +223,45 @@ model Booking {
   @@index([userId])
   @@index([experienceId])
   @@index([status])
-  @@index([date])
+  @@index([startDate])
+  @@index([paymentStatus])
+}
+
+// ============================================
+// PAYMENTS
+// ============================================
+
+model Payment {
+  id              String        @id @default(cuid())
+
+  // Booking
+  bookingId       String
+  booking         Booking       @relation(fields: [bookingId], references: [id])
+
+  // Payment Details
+  amount          Decimal       @db.Decimal(10, 2)
+  currency        String        @default("COP")
+  status          PaymentStatus @default(PENDING)
+  method          String        // stripe, cash, transfer, points
+
+  // Stripe Integration
+  stripePaymentIntentId String?  @unique
+  stripeChargeId       String?
+  stripeRefundId       String?
+
+  // Response from gateway
+  gatewayResponse Json?
+
+  // Metadata
+  description     String?
+  receiptUrl      String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([bookingId])
+  @@index([status])
+  @@index([stripePaymentIntentId])
 }
 
 // ============================================
@@ -233,14 +283,20 @@ model Review {
 
   // Review Content
   rating       Int        // 1-5
-  comment      String     @db.Text
-  images       String[]
+  title        String?
+  content      String     @db.Text
+  photos       String[]   // Photo URLs
+
+  // Verification
+  isVerified   Boolean    @default(false) // Verified purchase
+  isModerated  Boolean    @default(false) // Passed moderation
+  moderationNotes String? @db.Text
 
   // Provider Response
   response     String?    @db.Text
   respondedAt  DateTime?
 
-  // Helpful votes
+  // Engagement
   helpfulCount Int        @default(0)
 
   createdAt    DateTime   @default(now())
@@ -249,6 +305,7 @@ model Review {
   @@index([experienceId])
   @@index([userId])
   @@index([rating])
+  @@index([isVerified])
 }
 
 // ============================================
