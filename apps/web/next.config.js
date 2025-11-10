@@ -48,7 +48,7 @@ const nextConfig = {
     serverActions: {
       allowedOrigins: ['localhost:3000'],
     },
-    optimizeCss: true,
+    // optimizeCss: true, // Disabled - requires 'critters' package
     optimizePackageImports: ['@tanstack/react-query', 'framer-motion', 'zustand', 'date-fns'],
   },
 

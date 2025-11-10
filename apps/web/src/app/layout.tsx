@@ -1,14 +1,18 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+// import { Inter } from 'next/font/google';
 import '@/styles/globals.css';
 import { QueryProvider } from '@/providers/query-provider';
 import { WebSocketProvider } from '@/providers/websocket-provider';
 import { ToastProvider } from '@/providers/toast-provider';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
+// Temporarily disabled Google Fonts due to network issues
+// Using system fonts instead
+// const inter = Inter({
+//   subsets: ['latin'],
+//   variable: '--font-inter',
+//   fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+//   display: 'swap',
+// });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://viajeroconectado.com'),
@@ -98,7 +102,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={inter.variable}>
+    <html lang="es" style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
       <body className="antialiased">
         <QueryProvider>
           <WebSocketProvider>
