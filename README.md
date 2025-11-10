@@ -15,7 +15,7 @@ Plataforma que conecta viajeros, agencias, hoteles, guías y conductores en un e
 | **Frontend Web** | ✅ Completo | Next.js 14 (100%) |
 | **Testing** | ✅ Completo | Unit + E2E (100%) |
 | **DevOps/CI-CD** | ✅ Completo | Docker + K8s + Actions (100%) |
-| **Mobile** | ⏳ Pendiente | 0% |
+| **Mobile App** | 🟡 Base Lista | Config + Guía (40%) |
 
 **Ver detalles:** [PROJECT_SUMMARY.md](./docs/PROJECT_SUMMARY.md) | [PLATFORM_OVERVIEW.md](./docs/PLATFORM_OVERVIEW.md)
 
@@ -473,7 +473,7 @@ Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
 - [x] PWA configuration
 - [x] Performance optimizations (Web Vitals tracking)
 - [x] DevOps: Docker, Kubernetes, CI/CD
-- [ ] App móvil React Native (Pendiente)
+- [x] App móvil React Native - Configuración base y guía de implementación
 
 ### Fase 3 - Expansión LATAM (Q2-Q3 2025)
 - [ ] Multi-idioma (ES, EN, PT)
