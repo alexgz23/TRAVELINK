@@ -1,0 +1,388 @@
+// Prisma Schema for Viajero Conectado
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER & AUTH
+// ============================================
+
+enum UserRole {
+  TRAVELER
+  PROVIDER
+  ADMIN
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String
+  name            String
+  phone           String?
+  avatar          String?
+  birthDate       DateTime?
+  role            UserRole  @default(TRAVELER)
+  points          Int       @default(0)
+  isEmailVerified Boolean   @default(false)
+  isActive        Boolean   @default(true)
+
+  // Preferences (JSON)
+  preferences     Json?     // { language, currency, notifications }
+
+  // Relations
+  experiences     Experience[]
+  bookings        Booking[]
+  reviews         Review[]
+  posts           Post[]
+  likes           Like[]
+  comments        Comment[]
+  sentMessages    Message[]    @relation("SentMessages")
+  receivedMessages Message[]   @relation("ReceivedMessages")
+  conversations   ConversationParticipant[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+}
+
+// ============================================
+// EXPERIENCES
+// ============================================
+
+enum ExperienceCategory {
+  ADVENTURE
+  CULTURE
+  GASTRONOMY
+  WELLNESS
+  NATURE
+  URBAN
+  BEACH
+  MOUNTAINS
+}
+
+enum Difficulty {
+  EASY
+  MODERATE
+  HARD
+  EXTREME
+}
+
+model Experience {
+  id               String              @id @default(cuid())
+  title            String
+  slug             String              @unique
+  description      String              @db.Text
+  shortDescription String
+  category         ExperienceCategory
+
+  // Location
+  city             String
+  country          String              @default("Colombia")
+  address          String
+  latitude         Float?
+  longitude        Float?
+
+  // Pricing & Details
+  price            Decimal             @db.Decimal(10, 2)
+  duration         Int                 // hours
+  maxGroupSize     Int
+  difficulty       Difficulty
+
+  // Media
+  images           String[]
+  videoUrl         String?
+
+  // Details
+  includedItems    String[]
+  excludedItems    String[]
+  requirements     String[]
+  cancellationPolicy String            @db.Text
+  languages        String[]
+
+  // Ratings
+  rating           Float               @default(0)
+  reviewCount      Int                 @default(0)
+
+  // SEO & Discovery
+  tags             String[]
+
+  // Provider
+  providerId       String
+  provider         User                @relation(fields: [providerId], references: [id])
+
+  // Status
+  isActive         Boolean             @default(true)
+
+  // Relations
+  bookings         Booking[]
+  reviews          Review[]
+  posts            Post[]
+
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@index([providerId])
+  @@index([category])
+  @@index([city])
+  @@index([slug])
+  @@index([isActive])
+}
+
+// ============================================
+// BOOKINGS
+// ============================================
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum PaymentMethod {
+  CARD
+  CASH
+  TRANSFER
+  POINTS
+}
+
+model Booking {
+  id               String         @id @default(cuid())
+
+  // Experience
+  experienceId     String
+  experience       Experience     @relation(fields: [experienceId], references: [id])
+
+  // User
+  userId           String
+  user             User           @relation(fields: [userId], references: [id])
+
+  // Booking Details
+  date             DateTime
+  numberOfPeople   Int
+  totalPrice       Decimal        @db.Decimal(10, 2)
+  pointsUsed       Int            @default(0)
+
+  // Contact Info
+  contactName      String
+  contactEmail     String
+  contactPhone     String
+  specialRequests  String?        @db.Text
+
+  // Status
+  status           BookingStatus  @default(PENDING)
+  paymentStatus    PaymentStatus  @default(PENDING)
+  paymentMethod    PaymentMethod?
+
+  // Payment Info
+  stripePaymentId  String?
+
+  // Relations
+  review           Review?
+
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([experienceId])
+  @@index([status])
+  @@index([date])
+}
+
+// ============================================
+// REVIEWS
+// ============================================
+
+model Review {
+  id           String     @id @default(cuid())
+
+  // Relations
+  experienceId String
+  experience   Experience @relation(fields: [experienceId], references: [id])
+
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+
+  bookingId    String     @unique
+  booking      Booking    @relation(fields: [bookingId], references: [id])
+
+  // Review Content
+  rating       Int        // 1-5
+  comment      String     @db.Text
+  images       String[]
+
+  // Provider Response
+  response     String?    @db.Text
+  respondedAt  DateTime?
+
+  // Helpful votes
+  helpfulCount Int        @default(0)
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([experienceId])
+  @@index([userId])
+  @@index([rating])
+}
+
+// ============================================
+// SOCIAL / POSTS
+// ============================================
+
+model Post {
+  id           String     @id @default(cuid())
+
+  // Author
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+
+  // Optional Experience
+  experienceId String?
+  experience   Experience? @relation(fields: [experienceId], references: [id])
+
+  // Content
+  content      String     @db.Text
+  images       String[]
+
+  // Engagement
+  likeCount    Int        @default(0)
+  commentCount Int        @default(0)
+
+  // Relations
+  likes        Like[]
+  comments     Comment[]
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([userId])
+  @@index([experienceId])
+  @@index([createdAt])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+  @@index([postId])
+  @@index([userId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  content   String   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+  @@index([userId])
+}
+
+// ============================================
+// CHAT / MESSAGES
+// ============================================
+
+model Conversation {
+  id           String                    @id @default(cuid())
+
+  // Participants
+  participants ConversationParticipant[]
+
+  // Messages
+  messages     Message[]
+
+  // Last Activity
+  lastMessageAt DateTime?
+
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+
+  @@index([lastMessageAt])
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+
+  // Last read message timestamp
+  lastReadAt     DateTime?
+
+  createdAt      DateTime     @default(now())
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+  @@index([conversationId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  senderId       String
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
+
+  receiverId     String
+  receiver       User         @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  content        String       @db.Text
+
+  // Read status
+  isRead         Boolean      @default(false)
+  readAt         DateTime?
+
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+}
