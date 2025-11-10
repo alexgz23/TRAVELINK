@@ -306,7 +306,7 @@ export default function PaymentPage() {
                       <span className="font-medium">{booking.numberOfPeople}</span>
                     </div>
 
-                    {booking.pointsUsed > 0 && (
+                    {booking.pointsUsed && booking.pointsUsed > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Descuento (puntos)</span>
                         <span className="text-green-600">
