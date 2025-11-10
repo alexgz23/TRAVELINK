@@ -4,9 +4,8 @@ Guía completa para deployment del frontend web de Viajero Conectado.
 
 ## 📋 Pre-requisitos
 
-- Node.js 20+
-- Docker (opcional)
-- npm o yarn
+- Node.js 18+
+- pnpm 8+
 
 ## 🚀 Deployment Options
 
@@ -33,39 +32,26 @@ vercel --prod
 - Agrega todas las variables de `.env.example`
 - Marca las que sean públicas con `NEXT_PUBLIC_`
 
-### 2. Docker Deployment
-
-#### Build Docker Image
+### 2. Netlify
 
 ```bash
-# Build
-docker build -t viajero-web:latest .
+# Install Netlify CLI
+npm install -g netlify-cli
 
-# Run
-docker run -p 3000:3000 \
-  -e NEXT_PUBLIC_API_URL=https://api.viajeroconectado.com \
-  -e NEXT_PUBLIC_APP_URL=https://viajeroconectado.com \
-  viajero-web:latest
+# Login
+netlify login
+
+# Deploy
+netlify deploy
+
+# Deploy to production
+netlify deploy --prod
 ```
 
-#### Docker Compose
-
-```bash
-# Copy environment file
-cp .env.example .env
-
-# Edit .env with production values
-nano .env
-
-# Start services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-```
+**Build Settings:**
+- Build command: `pnpm build`
+- Publish directory: `.next`
+- Node version: 18
 
 ### 3. Manual Deployment
 
@@ -73,13 +59,13 @@ docker-compose down
 
 ```bash
 # Install dependencies
-npm ci
+pnpm install
 
 # Build
-npm run build
+pnpm build
 
 # Start production server
-npm start
+pnpm start
 ```
 
 #### PM2 (Process Manager)
@@ -114,21 +100,21 @@ amplify add hosting
 amplify publish
 ```
 
-### 5. Netlify
+### 5. Railway
 
-```bash
-# Install Netlify CLI
-npm install -g netlify-cli
+1. Conecta tu repositorio de GitHub
+2. Configura build command: `pnpm build`
+3. Configura start command: `pnpm start`
+4. Agrega variables de entorno
+5. Deploy automático
 
-# Login
-netlify login
+### 6. Render
 
-# Deploy
-netlify deploy
-
-# Deploy to production
-netlify deploy --prod
-```
+1. Conecta tu repositorio
+2. Build command: `pnpm install && pnpm build`
+3. Start command: `pnpm start`
+4. Configura environment variables
+5. Deploy
 
 ## 🔧 Environment Variables
 
@@ -142,7 +128,7 @@ NEXT_PUBLIC_WS_URL=wss://api.viajeroconectado.com
 # Application URL
 NEXT_PUBLIC_APP_URL=https://viajeroconectado.com
 
-# Mapbox Token
+# Mapbox Token (opcional)
 NEXT_PUBLIC_MAPBOX_TOKEN=your_mapbox_token
 ```
 
@@ -151,11 +137,9 @@ NEXT_PUBLIC_MAPBOX_TOKEN=your_mapbox_token
 ```bash
 # Analytics
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-NEXT_PUBLIC_ANALYTICS_URL=https://analytics.example.com
 
 # Error Tracking
 NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn
-SENTRY_AUTH_TOKEN=your_sentry_auth_token
 
 # Google Maps (alternative to Mapbox)
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_key
@@ -196,7 +180,7 @@ Analyze bundle size:
 
 ```bash
 # Run bundle analyzer
-ANALYZE=true npm run build
+ANALYZE=true pnpm build
 
 # Check reports in /analyze folder
 ```
@@ -216,20 +200,20 @@ ANALYZE=true npm run build
 
 ```bash
 # Run all tests
-npm run test
-npm run test:e2e
+pnpm test
+pnpm test:e2e
 
 # Check build
-npm run build
+pnpm build
 
 # Test production build locally
-npm run start
+pnpm start
 
 # Run linting
-npm run lint
+pnpm lint
 
 # Check type safety
-npx tsc --noEmit
+pnpm type-check
 ```
 
 ## 📈 Monitoring & Analytics
@@ -247,7 +231,7 @@ El proyecto ya incluye tracking de Web Vitals:
 
 ```bash
 # Install Sentry
-npm install @sentry/nextjs
+pnpm add @sentry/nextjs
 
 # Initialize Sentry
 npx @sentry/wizard@latest -i nextjs
@@ -275,16 +259,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 18
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
 
       - name: Run tests
-        run: npm test
+        run: pnpm test
 
       - name: Build
-        run: npm run build
+        run: pnpm build
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
@@ -306,8 +295,8 @@ CNAME   www     your-app.vercel.app          3600
 
 ### SSL/TLS
 
-- Vercel/Netlify: Auto SSL
-- Manual: Use Let's Encrypt
+- **Vercel/Netlify:** Auto SSL (Let's Encrypt)
+- **Manual:** Use Certbot
 
 ```bash
 # Certbot for Let's Encrypt
@@ -330,15 +319,15 @@ El proyecto ya está configurado como PWA:
 rm -rf .next
 
 # Clear node_modules and reinstall
-rm -rf node_modules package-lock.json
-npm install
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
 ```
 
 ### Memory Issues
 
 ```bash
 # Increase Node.js memory
-NODE_OPTIONS="--max-old-space-size=4096" npm run build
+NODE_OPTIONS="--max-old-space-size=4096" pnpm build
 ```
 
 ### API Connection Issues
@@ -350,7 +339,6 @@ NODE_OPTIONS="--max-old-space-size=4096" npm run build
 ## 📞 Support
 
 Para soporte técnico:
-- GitHub Issues: [link]
 - Email: tech@viajeroconectado.com
 - Documentación: `/FRONTEND_GUIDE.md`
 
@@ -361,3 +349,7 @@ Para soporte técnico:
 git tag -a v1.0.0 -m "Release v1.0.0"
 git push origin v1.0.0
 ```
+
+---
+
+**¡Deploy exitoso!** 🚀
