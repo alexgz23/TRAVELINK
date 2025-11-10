@@ -1,0 +1,188 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy (e.g., v1.0.0)'
+        required: true
+        type: string
+  push:
+    tags:
+      - 'v*'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        service: [backend, frontend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}
+          tags: |
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/${{ matrix.service }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}:buildcache,mode=max
+          build-args: |
+            VERSION=${{ github.ref_name }}
+
+  deploy-kubernetes:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+    if: success()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+          export KUBECONFIG=./kubeconfig
+
+      - name: Update deployment image
+        run: |
+          kubectl set image deployment/viajero-backend \
+            viajero-backend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:${{ github.ref_name }} \
+            --namespace=production
+
+          kubectl set image deployment/viajero-frontend \
+            viajero-frontend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:${{ github.ref_name }} \
+            --namespace=production
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/viajero-backend --namespace=production --timeout=5m
+          kubectl rollout status deployment/viajero-frontend --namespace=production --timeout=5m
+
+      - name: Verify deployment
+        run: |
+          kubectl get pods --namespace=production
+          kubectl get services --namespace=production
+
+  deploy-docker-swarm:
+    name: Deploy to Docker Swarm
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+    if: success()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          source: "docker-compose.prod.yml,.env.production"
+          target: "/opt/viajero-conectado"
+
+      - name: Deploy to Swarm
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            cd /opt/viajero-conectado
+            docker stack deploy -c docker-compose.prod.yml viajero --with-registry-auth
+            docker service ls
+            docker service ps viajero_backend
+            docker service ps viajero_frontend
+
+  smoke-tests:
+    name: Run Smoke Tests
+    runs-on: ubuntu-latest
+    needs: [deploy-kubernetes]
+    if: success()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Wait for services to be ready
+        run: sleep 30
+
+      - name: Test backend health endpoint
+        run: |
+          curl -f ${{ secrets.BACKEND_URL }}/api/v1/health || exit 1
+
+      - name: Test frontend health endpoint
+        run: |
+          curl -f ${{ secrets.FRONTEND_URL }}/api/health || exit 1
+
+      - name: Test API authentication
+        run: |
+          response=$(curl -s -X POST ${{ secrets.BACKEND_URL }}/api/v1/auth/login \
+            -H "Content-Type: application/json" \
+            -d '{"email":"test@example.com","password":"test123"}')
+          echo "$response" | jq -e '.accessToken' || exit 1
+
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [deploy-kubernetes, smoke-tests]
+    if: always()
+    steps:
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Deployment ${{ github.ref_name }} to production: ${{ job.status }}
+            Deployer: ${{ github.actor }}
+            Commit: ${{ github.sha }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: always()
+
+      - name: Create GitHub release
+        uses: actions/create-release@v1
+        if: success() && startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false

@@ -12,8 +12,9 @@ Plataforma que conecta viajeros, agencias, hoteles, guías y conductores en un e
 | **API Docs** | ✅ Completo | 11/11 APIs (100%) |
 | **Endpoints** | ✅ Completo | 169+ endpoints REST |
 | **Swagger/OpenAPI** | ✅ Completo | Documentación interactiva |
-| **Testing** | ⏳ Pendiente | 0% |
-| **Frontend** | ⏳ Pendiente | 0% |
+| **Frontend Web** | ✅ Completo | Next.js 14 (100%) |
+| **Testing** | ✅ Completo | Unit + E2E (100%) |
+| **DevOps/CI-CD** | ✅ Completo | Docker + K8s + Actions (100%) |
 | **Mobile** | ⏳ Pendiente | 0% |
 
 **Ver detalles:** [PROJECT_SUMMARY.md](./docs/PROJECT_SUMMARY.md) | [PLATFORM_OVERVIEW.md](./docs/PLATFORM_OVERVIEW.md)
@@ -61,10 +62,14 @@ Una plataforma integral que combina:
 - **Navegación:** Expo Router
 - **Estilos:** NativeWind
 
-### Infraestructura
-- **Containerización:** Docker
+### Infraestructura & DevOps
+- **Containerización:** Docker + Docker Compose
+- **Orquestación:** Kubernetes
+- **CI/CD:** GitHub Actions
+- **Reverse Proxy:** Nginx
+- **Monitoring:** Prometheus + Grafana
 - **Monorepo:** Turborepo
-- **Package Manager:** pnpm
+- **Package Manager:** pnpm / npm
 
 Ver [TECH_STACK.md](./TECH_STACK.md) para más detalles.
 
@@ -305,19 +310,65 @@ pnpm test
 
 ## Despliegue
 
+### Docker Compose (Desarrollo Local)
+
+```bash
+# Iniciar todos los servicios
+docker-compose up -d
+
+# Ver logs
+docker-compose logs -f backend frontend
+
+# Detener
+docker-compose down
+```
+
+### Docker Compose (Producción)
+
+```bash
+# Build y deploy
+docker-compose -f docker-compose.prod.yml up -d
+
+# Escalar servicios
+docker-compose -f docker-compose.prod.yml up -d --scale backend=3 --scale frontend=3
+```
+
+### Kubernetes
+
+```bash
+# Aplicar todos los manifests
+kubectl apply -f infrastructure/kubernetes/
+
+# Ver estado
+kubectl get pods -n viajero-conectado
+kubectl get services -n viajero-conectado
+kubectl get ingress -n viajero-conectado
+```
+
+Ver [infrastructure/kubernetes/README.md](infrastructure/kubernetes/README.md) para más detalles.
+
+### CI/CD (GitHub Actions)
+
+El proyecto incluye workflows automatizados:
+
+- **backend-ci.yml**: Lint, test, build, Docker push
+- **frontend-ci.yml**: Lint, test, E2E, build, deploy Vercel
+- **deploy-production.yml**: Deployment a Kubernetes/Swarm
+- **code-quality.yml**: Security scans, CodeQL, SonarCloud
+
 ### Desarrollo
-- **Backend:** Railway / Render
-- **Frontend:** Vercel
-- **Bases de datos:** Railway / Render
+- **Backend:** Railway / Render / Docker
+- **Frontend:** Vercel / Netlify
+- **Bases de datos:** Docker local / Railway
 
 ### Producción
-- **Backend:** AWS ECS / Fargate
-- **Frontend:** Vercel (Edge)
+- **Backend:** Kubernetes / AWS ECS / Docker Swarm
+- **Frontend:** Vercel (Edge) / Netlify
 - **Bases de datos:** AWS RDS + MongoDB Atlas
 - **Storage:** AWS S3 + CloudFront CDN
-- **Search:** Typesense Cloud
+- **Search:** Elasticsearch Cloud
 
-Ver [docs/deployment/](./docs/deployment/) para guías detalladas.
+Ver [apps/web/DEPLOYMENT.md](apps/web/DEPLOYMENT.md) para guías detalladas.
 
 ---
 
@@ -330,6 +381,56 @@ Cada aplicación tiene su archivo `.env.example`:
 - `apps/mobile/.env.example`
 
 **Importante:** Nunca commitear archivos `.env` reales.
+
+---
+
+## 📊 Monitoring y Observabilidad
+
+### Prometheus (Métricas)
+
+Acceder a: `http://localhost:9090`
+
+Métricas disponibles:
+- HTTP request duration & total
+- Database connection pool metrics
+- Redis operations & cache hit/miss ratio
+- Application-specific business metrics
+
+### Grafana (Visualización)
+
+Acceder a: `http://localhost:3001`
+- **Usuario**: admin
+- **Password**: admin (cambiar en producción)
+
+Dashboards incluidos:
+- **Application Overview**: Estado general del sistema
+- **API Performance**: Latencias y throughput
+- **Database Metrics**: Pool connections, query performance
+- **System Resources**: CPU, memoria, disco, red
+
+### Logs
+
+```bash
+# Logs de Docker Compose
+docker-compose logs -f [service-name]
+
+# Logs de Kubernetes
+kubectl logs -f deployment/viajero-backend -n viajero-conectado
+kubectl logs -f deployment/viajero-frontend -n viajero-conectado
+```
+
+### Health Checks
+
+```bash
+# Backend health
+curl http://localhost:4000/api/v1/health
+
+# Frontend health
+curl http://localhost:3000/api/health
+
+# Nginx status
+curl http://localhost:8080/nginx_status
+```
 
 ---
 
@@ -360,13 +461,19 @@ Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
 - [x] Swagger/OpenAPI interactivo
 - [x] Sistema de seguridad (JWT, RBAC, Rate Limiting)
 
-### Fase 2 - Frontend & Testing (En Progreso)
-- [ ] Tests unitarios backend (Jest)
-- [ ] Tests E2E backend
-- [ ] Frontend web Next.js 14
-- [ ] App móvil React Native
-- [ ] Integración pagos (Stripe, Mercado Pago)
-- [ ] UI/UX Design System
+### Fase 2 - Frontend & Testing (✅ COMPLETADA)
+- [x] Tests unitarios backend (Jest)
+- [x] Tests E2E backend
+- [x] Frontend web Next.js 14 con App Router
+- [x] Tests unitarios frontend (Vitest)
+- [x] Tests E2E frontend (Playwright - 27 tests)
+- [x] UI/UX Design System con Tailwind CSS
+- [x] Integración pagos (Wompi - Card + PSE)
+- [x] SEO optimizations (meta tags, sitemap, structured data)
+- [x] PWA configuration
+- [x] Performance optimizations (Web Vitals tracking)
+- [x] DevOps: Docker, Kubernetes, CI/CD
+- [ ] App móvil React Native (Pendiente)
 
 ### Fase 3 - Expansión LATAM (Q2-Q3 2025)
 - [ ] Multi-idioma (ES, EN, PT)

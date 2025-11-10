@@ -1,0 +1,217 @@
+name: Code Quality & Security
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 0 * * 0' # Weekly on Sunday
+
+jobs:
+  dependency-check:
+    name: Dependency Security Scan
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [backend, web]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run npm audit
+        working-directory: apps/${{ matrix.project }}
+        run: npm audit --production
+        continue-on-error: true
+
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file=apps/${{ matrix.project }}/package.json
+
+  codeql-analysis:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript', 'typescript']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  sonarcloud:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for better analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies (Backend)
+        working-directory: apps/backend
+        run: npm ci
+
+      - name: Install dependencies (Frontend)
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Run tests with coverage (Backend)
+        working-directory: apps/backend
+        run: npm run test:cov
+        continue-on-error: true
+
+      - name: Run tests with coverage (Frontend)
+        working-directory: apps/web
+        run: npm run test:coverage
+        continue-on-error: true
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  docker-security-scan:
+    name: Docker Image Security Scan
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [backend, frontend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t ${{ matrix.service }}:test ./apps/${{ matrix.service }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ matrix.service }}:test
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  license-check:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install license checker
+        run: npm install -g license-checker
+
+      - name: Check Backend licenses
+        working-directory: apps/backend
+        run: |
+          npm ci
+          license-checker --production --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD" || true
+
+      - name: Check Frontend licenses
+        working-directory: apps/web
+        run: |
+          npm ci
+          license-checker --production --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD" || true
+
+  code-coverage:
+    name: Code Coverage Report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install and test Backend
+        working-directory: apps/backend
+        run: |
+          npm ci
+          npm run test:cov
+
+      - name: Install and test Frontend
+        working-directory: apps/web
+        run: |
+          npm ci
+          npm run test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./apps/backend/coverage/lcov.info,./apps/web/coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  code-quality-metrics:
+    name: Code Quality Metrics
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Code Climate analysis
+        uses: paambaati/codeclimate-action@v5.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageLocations: |
+            ${{github.workspace}}/apps/backend/coverage/lcov.info:lcov
+            ${{github.workspace}}/apps/web/coverage/lcov.info:lcov
+
+  secret-scanning:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
