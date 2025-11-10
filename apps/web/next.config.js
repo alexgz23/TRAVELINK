@@ -3,9 +3,6 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 
-  // Transpile packages from monorepo
-  transpilePackages: ['@viajero-conectado/shared', '@viajero-conectado/types'],
-
   // Image optimization
   images: {
     remotePatterns: [

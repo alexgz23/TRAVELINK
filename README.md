@@ -1,442 +1,255 @@
-# Viajero Conectado
+# Viajero Conectado - Web App
 
-**Red social + marketplace de viajes + ecosistema B2B**
+Red social + marketplace de viajes en Colombia. Aplicación web frontend construida con Next.js 14.
 
-Plataforma que conecta viajeros, agencias, hoteles, guías y conductores en un ecosistema completo de turismo.
+![Status](https://img.shields.io/badge/status-active-success.svg)
+![Next.js](https://img.shields.io/badge/Next.js-14.2-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.3-38bdf8)
 
-## 📊 Estado del Proyecto
-
-| Componente | Estado | Progreso |
-|------------|--------|----------|
-| **Backend Core** | ✅ Completo | 14/14 módulos (100%) |
-| **API Docs** | ✅ Completo | 14/14 APIs (100%) |
-| **Endpoints** | ✅ Completo | 200+ endpoints REST |
-| **Swagger/OpenAPI** | ✅ Completo | Documentación interactiva |
-| **Frontend Web** | ✅ Completo | Next.js 14 (100%) |
-| **Testing** | ✅ Completo | Unit + E2E (100%) |
-| **DevOps/CI-CD** | ✅ Completo | Docker + K8s + Actions (100%) |
-| **Mobile App** | 🟡 Base Lista | Config + Guía (40%) |
-
-**Ver detalles:** [PROJECT_SUMMARY.md](./docs/PROJECT_SUMMARY.md) | [PLATFORM_OVERVIEW.md](./docs/PLATFORM_OVERVIEW.md)
-
----
-
-## Qué es Viajero Conectado
-
-Una plataforma integral que combina:
-
-- **Marketplace multivendedor:** Tours, paquetes, hoteles, guías, transporte y productos
-- **Red social de viajes:** Feed, stories, chat, rutas compartidas, reseñas
-- **Mapa y diario de viaje:** "Capturado en Ruta" - recuerdos, fotos y videos por viaje
-- **Programa de puntos y niveles:** Sistema de fidelización gamificado
-- **Alianzas B2B:** Agencias, hoteles, guías y conductores trabajando entre sí
-
-### Storytelling
-
-> "No es solo una web de tours. Es una red social de viajes donde cada historia, reseña, foto y reserva conecta viajeros, agencias y proveedores en un mismo ecosistema."
-
-**Origen:** Nace en Colombia, aprovechando la diversidad de destinos y culturas, pero pensado desde el inicio para Latinoamérica y el mundo.
-
----
-
-## Stack Tecnológico
-
-### Backend
-- **Framework:** NestJS 10+ con TypeScript
-- **Bases de datos:**
-  - PostgreSQL (relacional)
-  - MongoDB (social)
-  - Redis (caché)
-- **Búsqueda:** Typesense
-- **Storage:** AWS S3 / Cloudflare R2
-- **Pagos:** Stripe + Mercado Pago
-
-### Frontend Web
-- **Framework:** Next.js 14 (App Router)
-- **Lenguaje:** TypeScript 5+
-- **Estilos:** TailwindCSS 3+
-- **Estado:** Zustand + TanStack Query
-
-### Mobile
-- **Framework:** React Native + Expo SDK 50
-- **Navegación:** Expo Router
-- **Estilos:** NativeWind
-
-### Infraestructura & DevOps
-- **Containerización:** Docker + Docker Compose
-- **Orquestación:** Kubernetes
-- **CI/CD:** GitHub Actions
-- **Reverse Proxy:** Nginx
-- **Monitoring:** Prometheus + Grafana
-- **Monorepo:** Turborepo
-- **Package Manager:** pnpm / npm
-
-Ver [TECH_STACK.md](./TECH_STACK.md) para más detalles.
-
----
-
-## Estructura del Proyecto
-
-```
-viajero-conectado/
-├── apps/
-│   ├── backend/           # API NestJS
-│   ├── web/               # Frontend Next.js
-│   └── mobile/            # App React Native
-├── packages/
-│   ├── shared/            # Código compartido
-│   ├── types/             # TypeScript types
-│   ├── config/            # Configuraciones
-│   └── ui/                # Componentes UI compartidos
-├── docs/
-│   ├── architecture/      # Documentación de arquitectura
-│   ├── api/               # Documentación de API
-│   └── user-guides/       # Guías de usuario
-├── infrastructure/
-│   ├── docker/            # Dockerfiles
-│   └── scripts/           # Scripts de utilidad
-└── .github/
-    └── workflows/         # CI/CD
-```
-
----
-
-## Inicio Rápido
-
-> 🚀 **¿Primera vez?** Lee la [**Guía de Inicio Completa (GETTING_STARTED.md)**](./GETTING_STARTED.md) con instrucciones paso a paso para tener el proyecto corriendo en menos de 10 minutos.
+## 🚀 Inicio Rápido
 
 ### Prerrequisitos
 
-- **Node.js** 18+ ([Download](https://nodejs.org/))
+- **Node.js** 18+ ([Descargar](https://nodejs.org/))
 - **pnpm** 8+ (`npm install -g pnpm`)
-- **Docker Desktop** ([Download](https://www.docker.com/products/docker-desktop))
-- **Git** ([Download](https://git-scm.com/))
 
 ### Instalación
 
-1. **Clonar el repositorio**
-
 ```bash
-git clone https://github.com/tu-org/viajero-conectado.git
-cd viajero-conectado
-```
+# 1. Clonar el repositorio
+git clone <tu-repo-url>
+cd TRAVELINK
 
-2. **Ejecutar setup automático**
-
-```bash
-chmod +x infrastructure/scripts/dev-setup.sh
-./infrastructure/scripts/dev-setup.sh
-```
-
-Este script:
-- Verifica Docker
-- Instala pnpm si es necesario
-- Copia archivos `.env`
-- Instala dependencias
-- Levanta servicios de Docker
-
-3. **Iniciar servicios**
-
-```bash
-# Terminal 1 - Backend
-cd apps/backend
-pnpm dev
-
-# Terminal 2 - Frontend Web
+# 2. Instalar dependencias
 cd apps/web
-pnpm dev
-
-# Terminal 3 - Mobile (opcional)
-cd apps/mobile
-pnpm start
-```
-
-4. **Acceder a la aplicación**
-
-- **Frontend Web:** http://localhost:3000
-- **Backend API:** http://localhost:4000
-- **API Docs:** http://localhost:4000/api/docs
-- **MinIO Console:** http://localhost:9001
-- **Mailhog (emails):** http://localhost:8025
-
----
-
-## Desarrollo
-
-### Comandos Útiles
-
-```bash
-# Instalar dependencias
 pnpm install
 
-# Desarrollo (todos los proyectos)
+# 3. Copiar variables de entorno
+cp .env.example .env.local
+
+# 4. Iniciar servidor de desarrollo
 pnpm dev
-
-# Build (todos los proyectos)
-pnpm build
-
-# Tests
-pnpm test
-
-# Linting
-pnpm lint
-
-# Format
-pnpm format
-
-# Clean
-pnpm clean
 ```
 
-### Servicios Docker
+### Acceder a la aplicación
 
-```bash
-# Iniciar servicios
-docker-compose up -d
+Abre tu navegador en: **http://localhost:3000**
 
-# Ver logs
-docker-compose logs -f
+---
 
-# Detener servicios
-docker-compose down
+## 📁 Estructura del Proyecto
 
-# Detener y eliminar volúmenes (datos)
-docker-compose down -v
-
-# Ver estado
-docker-compose ps
 ```
-
-### Base de Datos
-
-```bash
-# Ejecutar migraciones
-cd apps/backend
-pnpm run migration:run
-
-# Crear nueva migración
-pnpm run migration:create -- nombre-migracion
-
-# Revertir última migración
-pnpm run migration:revert
-
-# Seed de datos de prueba
-pnpm run seed
+TRAVELINK/
+├── apps/
+│   └── web/                 # Aplicación Next.js
+│       ├── src/
+│       │   ├── app/         # App Router (rutas)
+│       │   ├── components/  # Componentes React
+│       │   ├── hooks/       # Custom hooks
+│       │   ├── lib/         # Utilidades y configs
+│       │   ├── providers/   # Context providers
+│       │   ├── styles/      # Estilos globales
+│       │   └── types/       # TypeScript types
+│       ├── public/          # Archivos estáticos
+│       ├── .env.local       # Variables de entorno (crear desde .env.example)
+│       └── package.json     # Dependencias
+└── README.md                # Este archivo
 ```
 
 ---
 
-## Arquitectura
+## 🛠️ Stack Tecnológico
 
-El proyecto usa una arquitectura **monolito modular** para el backend, preparada para escalar a microservicios.
-
-### Módulos Principales
-
-1. ✅ **Auth Module** - Autenticación y autorización JWT
-2. ✅ **Users Module** - Gestión de usuarios y perfiles multi-rol
-3. ✅ **Experiences Module** - Tours y experiencias turísticas
-4. ✅ **Bookings Module** - Sistema de reservas con estados completos
-5. ✅ **Payments Module** - Procesamiento de pagos multi-método
-6. ✅ **Social Module** - Red social con posts, comentarios, likes, follows
-7. ✅ **Points Module** - Sistema de puntos y gamificación con 5 niveles
-8. ✅ **Ads Module** - Plataforma publicitaria tipo Facebook Ads (CPC/CPM)
-9. ✅ **B2B Module** - Alianzas estratégicas con contratos y comisiones
-10. ✅ **Notifications Module** - Notificaciones multi-canal (In-App, Email, Push, SMS)
-11. ✅ **Reviews Module** - Reseñas y calificaciones con moderación
-12. ✅ **Chat Module** - Mensajería real-time con WebSocket (Socket.IO)
-13. ✅ **Media Module** - Gestión de multimedia con procesamiento de imágenes/videos
-14. ✅ **Search Module** - Búsqueda avanzada con Typesense
-
-Ver [docs/PLATFORM_OVERVIEW.md](./docs/PLATFORM_OVERVIEW.md) para documentación completa.
+| Tecnología | Descripción |
+|------------|-------------|
+| **Next.js 14** | Framework React con App Router |
+| **TypeScript 5** | Tipado estático |
+| **Tailwind CSS 3** | Framework de estilos utility-first |
+| **Zustand** | Gestión de estado global |
+| **TanStack Query v5** | Data fetching y caché |
+| **React Hook Form** | Formularios con validación |
+| **Zod** | Validación de schemas |
+| **Framer Motion** | Animaciones |
+| **Socket.io Client** | WebSocket para chat en tiempo real |
+| **Mapbox GL** | Mapas interactivos |
 
 ---
 
-## Roles de Usuario
-
-La plataforma soporta múltiples tipos de usuarios:
-
-### Viajero
-- Buscar y reservar experiencias
-- Red social de viajes
-- Sistema de puntos
-- "Capturado en Ruta" (galería)
-
-### Agencia de Viajes
-- Gestión de productos turísticos
-- Calendario y cupos
-- Ventas B2C y B2B
-- Reportes financieros
-
-### Hotel / Alojamiento
-- Inventario de habitaciones
-- Tarifas dinámicas
-- Reservas directas y B2B
-- Reputación
-
-### Guía Turístico
-- Perfil profesional
-- Agenda de servicios
-- Alianzas B2B con agencias
-- Reseñas
-
-### Conductor / Transporte
-- Gestión de flota
-- Rutas y servicios
-- Alianzas B2B
-- Seguimiento
-
-Ver documentación completa en [docs/](./docs/).
-
----
-
-## Testing
+## 📜 Scripts Disponibles
 
 ```bash
-# Backend (Jest)
-cd apps/backend
-pnpm test
-pnpm test:e2e
-pnpm test:cov
+# Desarrollo
+pnpm dev              # Servidor de desarrollo (puerto 3000)
+pnpm dev --turbo      # Con Turbopack (más rápido)
 
-# Frontend Web (Vitest)
+# Producción
+pnpm build            # Build optimizado para producción
+pnpm start            # Ejecutar build de producción
+
+# Testing
+pnpm test             # Tests unitarios (Vitest)
+pnpm test:ui          # Tests con interfaz UI
+pnpm test:e2e         # Tests end-to-end (Playwright)
+
+# Code Quality
+pnpm lint             # ESLint
+pnpm type-check       # Verificación de tipos TypeScript
+pnpm format           # Formatear código con Prettier
+
+# Análisis
+pnpm build:analyze    # Analizar tamaño del bundle
+```
+
+---
+
+## 🌐 Rutas Principales
+
+### Públicas (sin autenticación)
+- `/` - Homepage con hero section y categorías
+- `/experiences` - Catálogo de experiencias
+- `/experiences/[id]` - Detalle de experiencia
+- `/auth/login` - Iniciar sesión
+- `/auth/register` - Registro de usuario
+
+### Privadas (requieren autenticación)
+- `/dashboard` - Dashboard del usuario
+- `/booking/new` - Nueva reserva
+- `/booking/[id]/payment` - Proceso de pago
+- `/chat` - Chat en tiempo real
+- `/social` - Feed de red social
+- `/settings` - Configuración de usuario
+
+---
+
+## ⚙️ Variables de Entorno
+
+Crear archivo `.env.local` en `apps/web/` basado en `.env.example`:
+
+```env
+# API Backend (opcional - si tienes backend)
+NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+NEXT_PUBLIC_WS_URL=ws://localhost:4000
+
+# Mapbox (para mapas - opcional)
+NEXT_PUBLIC_MAPBOX_TOKEN=tu-token-aqui
+
+# Google Maps (alternativa - opcional)
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=tu-api-key-aqui
+
+# App Info
+NEXT_PUBLIC_APP_NAME=Viajero Conectado
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+**Nota:** La aplicación funciona perfectamente sin backend. Las llamadas API simplemente mostrarán errores en la consola pero el UI es completamente funcional.
+
+---
+
+## 🎨 Características
+
+### Implementadas
+- ✅ Homepage con hero section
+- ✅ Sistema de navegación completo
+- ✅ 10+ páginas funcionales
+- ✅ Componentes UI reutilizables
+- ✅ Formularios con validación
+- ✅ Responsive design (mobile-first)
+- ✅ Dark mode compatible
+- ✅ SEO optimizado
+- ✅ PWA configurado
+- ✅ Optimización de performance (Web Vitals)
+
+### En Desarrollo
+- 🚧 Integración con backend API
+- 🚧 Autenticación completa
+- 🚧 Sistema de pagos
+- 🚧 Chat en tiempo real
+- 🚧 Mapas interactivos
+
+---
+
+## 🚀 Deployment
+
+### Vercel (Recomendado)
+
+```bash
+# 1. Instalar Vercel CLI
+npm install -g vercel
+
+# 2. Deploy
 cd apps/web
-pnpm test
-pnpm test:ui
+vercel
+```
 
-# Mobile (Jest)
-cd apps/mobile
-pnpm test
+### Netlify
+
+```bash
+# Build command
+cd apps/web && pnpm build
+
+# Publish directory
+apps/web/.next
+```
+
+### Docker (si prefieres contenedores)
+
+```bash
+# Build
+docker build -t viajero-web -f apps/web/Dockerfile .
+
+# Run
+docker run -p 3000:3000 viajero-web
 ```
 
 ---
 
-## Despliegue
+## 📊 Performance
 
-### Docker Compose (Desarrollo Local)
-
-```bash
-# Iniciar todos los servicios
-docker-compose up -d
-
-# Ver logs
-docker-compose logs -f backend frontend
-
-# Detener
-docker-compose down
-```
-
-### Docker Compose (Producción)
-
-```bash
-# Build y deploy
-docker-compose -f docker-compose.prod.yml up -d
-
-# Escalar servicios
-docker-compose -f docker-compose.prod.yml up -d --scale backend=3 --scale frontend=3
-```
-
-### Kubernetes
-
-```bash
-# Aplicar todos los manifests
-kubectl apply -f infrastructure/kubernetes/
-
-# Ver estado
-kubectl get pods -n viajero-conectado
-kubectl get services -n viajero-conectado
-kubectl get ingress -n viajero-conectado
-```
-
-Ver [infrastructure/kubernetes/README.md](infrastructure/kubernetes/README.md) para más detalles.
-
-### CI/CD (GitHub Actions)
-
-El proyecto incluye workflows automatizados:
-
-- **backend-ci.yml**: Lint, test, build, Docker push
-- **frontend-ci.yml**: Lint, test, E2E, build, deploy Vercel
-- **deploy-production.yml**: Deployment a Kubernetes/Swarm
-- **code-quality.yml**: Security scans, CodeQL, SonarCloud
-
-### Desarrollo
-- **Backend:** Railway / Render / Docker
-- **Frontend:** Vercel / Netlify
-- **Bases de datos:** Docker local / Railway
-
-### Producción
-- **Backend:** Kubernetes / AWS ECS / Docker Swarm
-- **Frontend:** Vercel (Edge) / Netlify
-- **Bases de datos:** AWS RDS + MongoDB Atlas
-- **Storage:** AWS S3 + CloudFront CDN
-- **Search:** Elasticsearch Cloud
-
-Ver [apps/web/DEPLOYMENT.md](apps/web/DEPLOYMENT.md) para guías detalladas.
+La aplicación está optimizada para:
+- ⚡ First Contentful Paint (FCP) < 1.5s
+- ⚡ Largest Contentful Paint (LCP) < 2.5s
+- ⚡ Cumulative Layout Shift (CLS) < 0.1
+- ⚡ First Input Delay (FID) < 100ms
 
 ---
 
-## Variables de Entorno
+## 🐛 Troubleshooting
 
-Cada aplicación tiene su archivo `.env.example`:
-
-- `apps/backend/.env.example`
-- `apps/web/.env.example`
-- `apps/mobile/.env.example`
-
-**Importante:** Nunca commitear archivos `.env` reales.
-
----
-
-## 📊 Monitoring y Observabilidad
-
-### Prometheus (Métricas)
-
-Acceder a: `http://localhost:9090`
-
-Métricas disponibles:
-- HTTP request duration & total
-- Database connection pool metrics
-- Redis operations & cache hit/miss ratio
-- Application-specific business metrics
-
-### Grafana (Visualización)
-
-Acceder a: `http://localhost:3001`
-- **Usuario**: admin
-- **Password**: admin (cambiar en producción)
-
-Dashboards incluidos:
-- **Application Overview**: Estado general del sistema
-- **API Performance**: Latencias y throughput
-- **Database Metrics**: Pool connections, query performance
-- **System Resources**: CPU, memoria, disco, red
-
-### Logs
-
+### Puerto 3000 ya está en uso
 ```bash
-# Logs de Docker Compose
-docker-compose logs -f [service-name]
-
-# Logs de Kubernetes
-kubectl logs -f deployment/viajero-backend -n viajero-conectado
-kubectl logs -f deployment/viajero-frontend -n viajero-conectado
+# Cambiar puerto
+PORT=3001 pnpm dev
 ```
 
-### Health Checks
-
+### Errores de TypeScript
 ```bash
-# Backend health
-curl http://localhost:4000/api/v1/health
+# Limpiar y reconstruir
+rm -rf .next
+pnpm dev
+```
 
-# Frontend health
-curl http://localhost:3000/api/health
-
-# Nginx status
-curl http://localhost:8080/nginx_status
+### Problemas con dependencias
+```bash
+# Reinstalar
+rm -rf node_modules
+pnpm install
 ```
 
 ---
 
-## Contribuir
+## 📝 Notas Importantes
+
+1. **Sin Backend:** La app funciona sin backend. Solo verás errores de red en la consola del navegador, pero el UI es totalmente funcional.
+
+2. **Fuentes del Sistema:** Actualmente usa fuentes del sistema (system-ui). Para habilitar Google Fonts, edita `src/app/layout.tsx`.
+
+3. **Mapbox Token:** Para que los mapas funcionen, necesitas obtener un token gratis en [mapbox.com](https://www.mapbox.com/).
+
+---
+
+## 🤝 Contribuir
 
 1. Fork el proyecto
 2. Crea tu feature branch (`git checkout -b feature/AmazingFeature`)
@@ -444,106 +257,19 @@ curl http://localhost:8080/nginx_status
 4. Push al branch (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
-Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
-
 ---
 
-## Roadmap
-
-### Fase 1 - Backend Core (✅ COMPLETADA)
-- [x] Arquitectura base modular NestJS
-- [x] Módulos core (Auth, Users, Experiences, Bookings, Payments)
-- [x] Red social completa (posts, comentarios, likes, follows)
-- [x] Sistema de puntos y gamificación (5 niveles)
-- [x] Plataforma publicitaria (CPC/CPM)
-- [x] Alianzas B2B con contratos y comisiones
-- [x] Sistema de notificaciones multi-canal (In-App, Email, Push, SMS)
-- [x] Reseñas y calificaciones con moderación
-- [x] Chat en tiempo real con WebSocket (Socket.IO)
-- [x] Gestión de multimedia con procesamiento de imágenes/videos
-- [x] Búsqueda avanzada con Typesense
-- [x] Documentación completa de 14 APIs (200+ endpoints)
-- [x] Swagger/OpenAPI interactivo
-- [x] Sistema de seguridad (JWT, RBAC, Rate Limiting)
-
-### Fase 2 - Frontend & Testing (✅ COMPLETADA)
-- [x] Tests unitarios backend (Jest)
-- [x] Tests E2E backend
-- [x] Frontend web Next.js 14 con App Router
-- [x] Tests unitarios frontend (Vitest)
-- [x] Tests E2E frontend (Playwright - 27 tests)
-- [x] UI/UX Design System con Tailwind CSS
-- [x] Integración pagos (Wompi - Card + PSE)
-- [x] SEO optimizations (meta tags, sitemap, structured data)
-- [x] PWA configuration
-- [x] Performance optimizations (Web Vitals tracking)
-- [x] DevOps: Docker, Kubernetes, CI/CD
-- [x] App móvil React Native - Configuración base y guía de implementación
-
-### Fase 3 - Expansión LATAM (Q2-Q3 2025)
-- [ ] Multi-idioma (ES, EN, PT)
-- [ ] Multi-moneda
-- [ ] B2B completo
-- [ ] Apps para guías y conductores
-- [ ] Analytics avanzado
-- [ ] Marketing automation
-
-### Fase 4 - Global (Q4 2025+)
-- [ ] Internacionalización completa
-- [ ] Machine Learning (recomendaciones)
-- [ ] API pública para partners
-- [ ] Programa de afiliados
-- [ ] White-label para agencias
-
----
-
-## Documentación
-
-### General
-- [Resumen de la Plataforma](./docs/PLATFORM_OVERVIEW.md) - Visión general completa
-- [Stack Tecnológico](./TECH_STACK.md) - Tecnologías utilizadas
-- [Arquitectura](./docs/architecture/ARCHITECTURE.md) - Diseño del sistema
-- [Esquema de DB](./docs/architecture/DATABASE_SCHEMA.md) - Estructura de datos
-
-### APIs Documentadas (100% Completas)
-
-**Core APIs:**
-- [Auth API](./docs/api/AUTH_API.md) - Autenticación JWT y gestión de sesiones (7 endpoints)
-- [Users API](./docs/api/USERS_API.md) - Gestión de usuarios y perfiles (6 endpoints)
-- [Experiences API](./docs/api/EXPERIENCES_API.md) - Marketplace de tours (17 endpoints)
-- [Bookings API](./docs/api/BOOKINGS_API.md) - Sistema de reservas (13 endpoints)
-- [Payments API](./docs/api/PAYMENTS_API.md) - Procesamiento de pagos (9 endpoints)
-
-**Ecosystem APIs:**
-- [Social API](./docs/api/SOCIAL_API.md) - Red social de viajes (20+ endpoints)
-- [Points API](./docs/api/POINTS_API.md) - Sistema de puntos y gamificación (15+ endpoints)
-- [Ads API](./docs/api/ADS_API.md) - Plataforma publicitaria CPC/CPM (23+ endpoints)
-- [B2B API](./docs/api/B2B_API.md) - Alianzas estratégicas (20+ endpoints)
-- [Notifications API](./docs/api/NOTIFICATIONS_API.md) - Notificaciones multi-canal (18+ endpoints)
-- [Reviews API](./docs/api/REVIEWS_API.md) - Reseñas y calificaciones (16+ endpoints)
-- [Chat API](./docs/api/CHAT_API.md) - Mensajería en tiempo real con WebSocket (12+ endpoints)
-- [Media API](./docs/api/MEDIA_API.md) - Gestión y procesamiento de multimedia (8+ endpoints)
-- [Search API](./docs/api/SEARCH_API.md) - Búsqueda avanzada con Typesense (10+ endpoints)
-
-**Total:** 200+ endpoints REST + WebSocket documentados
-
-**Swagger/OpenAPI:**
-- [API Docs Interactivos](http://localhost:4000/api/docs) - Documentación completa con Try-it-out
-
----
-
-## Licencia
+## 📄 Licencia
 
 Propietario - Todos los derechos reservados
 
 ---
 
-## Contacto
+## 📧 Contacto
 
 - **Website:** https://viajeroconectado.com
 - **Email:** contact@viajeroconectado.com
-- **Twitter:** [@viajeroconectado](https://twitter.com/viajeroconectado)
 
 ---
 
-**¡Construyamos juntos la red social de viajes más completa del mundo!** 🌍✈️
+**¡Construyendo la mejor red social de viajes!** 🌍✈️
