@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ExperiencesModule } from './experiences/experiences.module';
 import { BookingsModule } from './bookings/bookings.module';
+import { PaymentsModule } from './payments/payments.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { PostsModule } from './posts/posts.module';
 import { ChatModule } from './chat/chat.module';
@@ -37,6 +38,7 @@ import { HealthController } from './health.controller';
     UsersModule,
     ExperiencesModule,
     BookingsModule,
+    PaymentsModule,
     ReviewsModule,
     PostsModule,
     ChatModule,
