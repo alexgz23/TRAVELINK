@@ -8,9 +8,9 @@ Plataforma que conecta viajeros, agencias, hoteles, guías y conductores en un e
 
 | Componente | Estado | Progreso |
 |------------|--------|----------|
-| **Backend Core** | ✅ Completo | 11/11 módulos (100%) |
-| **API Docs** | ✅ Completo | 11/11 APIs (100%) |
-| **Endpoints** | ✅ Completo | 169+ endpoints REST |
+| **Backend Core** | ✅ Completo | 14/14 módulos (100%) |
+| **API Docs** | ✅ Completo | 14/14 APIs (100%) |
+| **Endpoints** | ✅ Completo | 200+ endpoints REST |
 | **Swagger/OpenAPI** | ✅ Completo | Documentación interactiva |
 | **Frontend Web** | ✅ Completo | Next.js 14 (100%) |
 | **Testing** | ✅ Completo | Unit + E2E (100%) |
@@ -102,6 +102,8 @@ viajero-conectado/
 ---
 
 ## Inicio Rápido
+
+> 🚀 **¿Primera vez?** Lee la [**Guía de Inicio Completa (GETTING_STARTED.md)**](./GETTING_STARTED.md) con instrucciones paso a paso para tener el proyecto corriendo en menos de 10 minutos.
 
 ### Prerrequisitos
 
@@ -241,9 +243,9 @@ El proyecto usa una arquitectura **monolito modular** para el backend, preparada
 9. ✅ **B2B Module** - Alianzas estratégicas con contratos y comisiones
 10. ✅ **Notifications Module** - Notificaciones multi-canal (In-App, Email, Push, SMS)
 11. ✅ **Reviews Module** - Reseñas y calificaciones con moderación
-12. ⏳ **Chat Module** - Mensajería real-time (pendiente)
-13. ⏳ **Media Module** - Gestión de multimedia (pendiente)
-14. ⏳ **Search Module** - Búsqueda con Typesense (pendiente)
+12. ✅ **Chat Module** - Mensajería real-time con WebSocket (Socket.IO)
+13. ✅ **Media Module** - Gestión de multimedia con procesamiento de imágenes/videos
+14. ✅ **Search Module** - Búsqueda avanzada con Typesense
 
 Ver [docs/PLATFORM_OVERVIEW.md](./docs/PLATFORM_OVERVIEW.md) para documentación completa.
 
@@ -457,7 +459,10 @@ Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
 - [x] Alianzas B2B con contratos y comisiones
 - [x] Sistema de notificaciones multi-canal (In-App, Email, Push, SMS)
 - [x] Reseñas y calificaciones con moderación
-- [x] Documentación completa de 11 APIs (169+ endpoints)
+- [x] Chat en tiempo real con WebSocket (Socket.IO)
+- [x] Gestión de multimedia con procesamiento de imágenes/videos
+- [x] Búsqueda avanzada con Typesense
+- [x] Documentación completa de 14 APIs (200+ endpoints)
 - [x] Swagger/OpenAPI interactivo
 - [x] Sistema de seguridad (JWT, RBAC, Rate Limiting)
 
@@ -516,8 +521,11 @@ Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
 - [B2B API](./docs/api/B2B_API.md) - Alianzas estratégicas (20+ endpoints)
 - [Notifications API](./docs/api/NOTIFICATIONS_API.md) - Notificaciones multi-canal (18+ endpoints)
 - [Reviews API](./docs/api/REVIEWS_API.md) - Reseñas y calificaciones (16+ endpoints)
+- [Chat API](./docs/api/CHAT_API.md) - Mensajería en tiempo real con WebSocket (12+ endpoints)
+- [Media API](./docs/api/MEDIA_API.md) - Gestión y procesamiento de multimedia (8+ endpoints)
+- [Search API](./docs/api/SEARCH_API.md) - Búsqueda avanzada con Typesense (10+ endpoints)
 
-**Total:** 169+ endpoints REST documentados
+**Total:** 200+ endpoints REST + WebSocket documentados
 
 **Swagger/OpenAPI:**
 - [API Docs Interactivos](http://localhost:4000/api/docs) - Documentación completa con Try-it-out
