@@ -18,6 +18,14 @@ enum UserRole {
   ADMIN
 }
 
+enum UserLevel {
+  EXPLORER
+  WALKER
+  ACTIVE_TRAVELER
+  EXPERT_TRAVELER
+  AMBASSADOR
+}
+
 model User {
   id              String    @id @default(cuid())
   email           String    @unique
@@ -28,8 +36,28 @@ model User {
   birthDate       DateTime?
   role            UserRole  @default(TRAVELER)
   points          Int       @default(0)
+  level           UserLevel @default(EXPLORER)
   isEmailVerified Boolean   @default(false)
   isActive        Boolean   @default(true)
+
+  // Extended Profile
+  bio             String?   @db.Text
+  country         String?
+  city            String?
+  languages       String[]  @default([])
+  travelStyle     String[]  @default([]) // ["Adventure", "Cultural", "Luxury", "Budget"]
+  budgetRange     String?   // "low", "medium", "high", "luxury"
+  dreamDestinations String[] @default([])
+
+  // Travel Statistics
+  countriesVisited String[] @default([])
+  citiesVisited    String[] @default([])
+  totalTrips       Int      @default(0)
+
+  // Privacy Settings
+  isProfilePublic  Boolean  @default(true)
+  showMap          Boolean  @default(true)
+  showTrips        Boolean  @default(true)
 
   // Preferences (JSON)
   preferences     Json?     // { language, currency, notifications }
@@ -44,12 +72,14 @@ model User {
   sentMessages    Message[]    @relation("SentMessages")
   receivedMessages Message[]   @relation("ReceivedMessages")
   conversations   ConversationParticipant[]
+  pointsTransactions PointsTransaction[]
 
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
   @@index([email])
   @@index([role])
+  @@index([level])
 }
 
 model RefreshToken {
@@ -442,4 +472,45 @@ model Message {
   @@index([senderId])
   @@index([receiverId])
   @@index([createdAt])
+}
+
+// ============================================
+// POINTS & GAMIFICATION
+// ============================================
+
+enum PointsTransactionType {
+  EARNED_BOOKING
+  EARNED_REVIEW
+  EARNED_POST
+  EARNED_REFERRAL
+  EARNED_MISSION
+  SPENT_REWARD
+  SPENT_BOOKING
+  ADMIN_ADJUSTMENT
+  EXPIRED
+}
+
+model PointsTransaction {
+  id          String                @id @default(cuid())
+  userId      String
+  user        User                  @relation(fields: [userId], references: [id])
+
+  amount      Int                   // Positive for earned, negative for spent
+  type        PointsTransactionType
+  reason      String                @db.Text
+
+  // Optional reference to related entity
+  referenceId String?               // ID of booking, review, post, etc.
+  referenceType String?             // "booking", "review", "post", etc.
+
+  // Expiration (for earned points)
+  expiresAt   DateTime?
+  isExpired   Boolean               @default(false)
+
+  createdAt   DateTime              @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([expiresAt])
 }

@@ -12,6 +12,7 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { PostsModule } from './posts/posts.module';
 import { ChatModule } from './chat/chat.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { GamificationModule } from './gamification/gamification.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -43,6 +44,7 @@ import { HealthController } from './health.controller';
     PostsModule,
     ChatModule,
     UploadsModule,
+    GamificationModule,
   ],
   controllers: [HealthController],
   providers: [
