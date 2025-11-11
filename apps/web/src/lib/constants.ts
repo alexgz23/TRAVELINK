@@ -38,6 +38,11 @@ export const API_ENDPOINTS = {
     BASE: '/users',
     BY_ID: (id: string) => `/users/${id}`,
     PROFILE: (id: string) => `/users/${id}/profile`,
+    UPDATE_PROFILE: '/users/profile',
+    UPDATE_EXTENDED_PROFILE: '/users/profile/extended',
+    UPDATE_PRIVACY: '/users/privacy',
+    STATS: '/users/stats',
+    MAP: (id: string) => `/users/${id}/map`,
     FOLLOWERS: (id: string) => `/users/${id}/followers`,
     FOLLOWING: (id: string) => `/users/${id}/following`,
     FOLLOW: (id: string) => `/users/${id}/follow`,
@@ -88,11 +93,12 @@ export const API_ENDPOINTS = {
     AUTOCOMPLETE: '/search/autocomplete',
     POPULAR: '/search/popular',
   },
-  // Points
-  POINTS: {
-    BALANCE: '/points/balance',
-    HISTORY: '/points/history',
-    REDEEM: '/points/redeem',
+  // Gamification/Points
+  GAMIFICATION: {
+    BALANCE: '/gamification/points/balance',
+    HISTORY: '/gamification/points/history',
+    LEVELS: '/gamification/levels',
+    RULES: '/gamification/points/rules',
   },
 } as const;
 
@@ -106,6 +112,8 @@ export const QUERY_KEYS = {
   USERS: {
     BY_ID: (id: string) => ['users', id],
     PROFILE: (id: string) => ['users', id, 'profile'],
+    STATS: (id: string) => ['users', id, 'stats'],
+    MAP: (id: string) => ['users', id, 'map'],
     FOLLOWERS: (id: string) => ['users', id, 'followers'],
     FOLLOWING: (id: string) => ['users', id, 'following'],
   },
@@ -134,6 +142,12 @@ export const QUERY_KEYS = {
     CONVERSATIONS: ['chat', 'conversations'],
     CONVERSATION_BY_ID: (id: string) => ['chat', 'conversations', id],
     MESSAGES: (conversationId: string) => ['chat', 'messages', conversationId],
+  },
+  GAMIFICATION: {
+    BALANCE: ['gamification', 'balance'],
+    HISTORY: ['gamification', 'history'],
+    LEVELS: ['gamification', 'levels'],
+    RULES: ['gamification', 'rules'],
   },
 } as const;
 

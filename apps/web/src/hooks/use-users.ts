@@ -108,3 +108,62 @@ export function useSearchUsers(query: string) {
     staleTime: 1000 * 60 * 2,
   });
 }
+
+/**
+ * Fetch user statistics (Dashboard)
+ */
+export function useUserStats(userId?: string) {
+  return useQuery({
+    queryKey: userId ? QUERY_KEYS.USERS.STATS(userId) : QUERY_KEYS.USERS.STATS('me'),
+    queryFn: () => get<any>(API_ENDPOINTS.USERS.STATS),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+/**
+ * Fetch user travel map
+ */
+export function useUserMap(userId: string) {
+  return useQuery({
+    queryKey: QUERY_KEYS.USERS.MAP(userId),
+    queryFn: () => get<any>(API_ENDPOINTS.USERS.MAP(userId)),
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+/**
+ * Update extended profile (bio, travel preferences)
+ */
+export function useUpdateExtendedProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: any) =>
+      patch<User>(API_ENDPOINTS.USERS.UPDATE_EXTENDED_PROFILE, data),
+    onSuccess: (updatedUser) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.ME });
+      if (updatedUser?.id) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS.BY_ID(updatedUser.id) });
+      }
+    },
+  });
+}
+
+/**
+ * Update privacy settings
+ */
+export function useUpdatePrivacy() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: any) =>
+      patch<User>(API_ENDPOINTS.USERS.UPDATE_PRIVACY, data),
+    onSuccess: (updatedUser) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.ME });
+      if (updatedUser?.id) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS.BY_ID(updatedUser.id) });
+      }
+    },
+  });
+}
