@@ -19,10 +19,16 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@/*": ["src/*"],
-      "@shared/*": ["../../packages/shared/src/*"],
-      "@types/*": ["../../packages/types/src/*"],
-      "@viajero-conectado/types": ["../../packages/types/src"],
-      "@viajero-conectado/shared": ["../../packages/shared/src"]
+      "@/auth/*": ["src/auth/*"],
+      "@/users/*": ["src/users/*"],
+      "@/experiences/*": ["src/experiences/*"],
+      "@/bookings/*": ["src/bookings/*"],
+      "@/reviews/*": ["src/reviews/*"],
+      "@/posts/*": ["src/posts/*"],
+      "@/chat/*": ["src/chat/*"],
+      "@/uploads/*": ["src/uploads/*"],
+      "@/common/*": ["src/common/*"],
+      "@/config/*": ["src/config/*"]
     }
   },
   "include": ["src/**/*"],

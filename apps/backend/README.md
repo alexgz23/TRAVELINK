@@ -1,67 +1,160 @@
-# Backend - Viajero Conectado
+# Viajero Conectado - Backend API
 
-API REST construida con NestJS + TypeScript.
+Backend API construido con NestJS, Prisma y PostgreSQL.
 
-## Stack
+## 🚀 Inicio Rápido
 
-- **Framework:** NestJS 10+
-- **Lenguaje:** TypeScript 5+
-- **Base de datos relacional:** PostgreSQL (TypeORM)
-- **Base de datos NoSQL:** MongoDB
-- **Caché:** Redis
-- **Documentación:** Swagger/OpenAPI
-
-## Estructura del proyecto
-
-```
-src/
-├── modules/           # Módulos funcionales
-│   ├── auth/         # Autenticación y autorización
-│   ├── users/        # Gestión de usuarios
-│   ├── experiences/  # Tours y experiencias
-│   ├── bookings/     # Sistema de reservas
-│   ├── social/       # Red social
-│   ├── b2b/          # Alianzas B2B
-│   ├── payments/     # Pagos (Stripe, Mercado Pago)
-│   ├── media/        # Gestión de multimedia
-│   └── points/       # Sistema de puntos
-├── common/           # Código compartido
-│   ├── decorators/   # Decoradores custom
-│   ├── guards/       # Guards de autenticación/autorización
-│   ├── filters/      # Exception filters
-│   ├── interceptors/ # Interceptors
-│   └── pipes/        # Validation pipes
-├── config/           # Configuraciones
-├── app.module.ts     # Módulo raíz
-└── main.ts          # Entry point
-```
-
-## Instalación
+### Opción A: Setup Automático (Recomendado)
 
 ```bash
-# Instalar dependencias
+cd apps/backend
+./quick-start.sh
+```
+
+El script te guiará por todo el proceso de configuración automáticamente.
+
+### Opción B: Setup Manual
+
+#### 1. Instalar PostgreSQL
+
+Necesitas tener PostgreSQL instalado y corriendo.
+
+**macOS:**
+```bash
+brew install postgresql@15
+brew services start postgresql@15
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
+```
+
+**Windows:**
+Descargar desde https://www.postgresql.org/download/windows/
+
+**Alternativa - PostgreSQL Cloud (Gratis):**
+- **Supabase:** https://supabase.com
+- **Neon:** https://neon.tech
+- **Railway:** https://railway.app
+
+### 2. Crear base de datos
+
+```bash
+# Conectar a PostgreSQL
+psql -U postgres
+
+# Crear base de datos
+CREATE DATABASE viajero_conectado;
+
+# (Opcional) Crear usuario
+CREATE USER viajero_user WITH PASSWORD 'tu_password';
+GRANT ALL PRIVILEGES ON DATABASE viajero_conectado TO viajero_user;
+
+# Salir
+\q
+```
+
+### 3. Instalar dependencias
+
+```bash
+cd apps/backend
 pnpm install
-
-# Copiar variables de entorno
-cp .env.example .env
-
-# Editar .env con tus credenciales
 ```
 
-## Desarrollo
+### 4. Configurar variables de entorno
 
 ```bash
-# Modo desarrollo con hot-reload
-pnpm dev
-
-# Modo debug
-pnpm start:debug
+cp .env.example .env
 ```
 
-La API estará disponible en `http://localhost:4000`
-La documentación Swagger en `http://localhost:4000/api/docs`
+Editar `.env` con tu conexión PostgreSQL:
 
-## Testing
+```env
+DATABASE_URL="postgresql://postgres:password@localhost:5432/viajero_conectado?schema=public"
+```
+
+### 5. Ejecutar migraciones
+
+```bash
+# Generar cliente de Prisma
+pnpm prisma:generate
+
+# Crear y aplicar migraciones
+pnpm prisma:migrate
+
+# (Opcional) Ver base de datos con Prisma Studio
+pnpm prisma:studio
+```
+
+### 6. Iniciar servidor de desarrollo
+
+```bash
+pnpm dev
+```
+
+El servidor estará disponible en: **http://localhost:4000**
+
+## 📚 Documentación API
+
+Una vez el servidor esté corriendo, accede a la documentación interactiva de Swagger:
+
+**http://localhost:4000/api/docs**
+
+## 🔑 Endpoints Principales
+
+### Auth
+- `POST /api/v1/auth/register` - Registrar usuario
+- `POST /api/v1/auth/login` - Iniciar sesión
+- `POST /api/v1/auth/refresh` - Refrescar token
+- `POST /api/v1/auth/logout` - Cerrar sesión
+- `GET /api/v1/auth/me` - Obtener usuario actual
+
+### Users
+- `GET /api/v1/users/profile` - Perfil del usuario
+- `PUT /api/v1/users/profile` - Actualizar perfil
+- `GET /api/v1/users/stats` - Estadísticas del usuario
+
+### Experiences
+- `GET /api/v1/experiences` - Listar experiencias
+- `GET /api/v1/experiences/:id` - Detalle de experiencia
+- `POST /api/v1/experiences` - Crear experiencia (PROVIDER)
+- `PUT /api/v1/experiences/:id` - Actualizar experiencia
+- `DELETE /api/v1/experiences/:id` - Eliminar experiencia
+
+### Bookings (🟡 Pendiente)
+- `GET /api/v1/bookings` - Mis reservas
+- `POST /api/v1/bookings` - Crear reserva
+
+### Reviews (🟡 Pendiente)
+- `GET /api/v1/reviews` - Listar reseñas
+- `POST /api/v1/reviews` - Crear reseña
+
+### Posts (🟡 Pendiente)
+- `GET /api/v1/posts` - Feed de posts
+- `POST /api/v1/posts` - Crear post
+
+### Chat (🟡 Pendiente)
+- WebSocket en `/` para mensajería en tiempo real
+
+### Uploads (🟡 Pendiente)
+- `POST /api/v1/uploads/image` - Subir imagen
+
+## 🗄️ Estructura de Base de Datos
+
+### Modelos Principales:
+- **User** - Usuarios (TRAVELER, PROVIDER, ADMIN)
+- **Experience** - Experiencias turísticas
+- **Booking** - Reservas
+- **Review** - Reseñas y ratings
+- **Post** - Red social
+- **Message** - Chat
+- **RefreshToken** - Tokens JWT
+
+Ver `prisma/schema.prisma` para más detalles.
+
+## 🧪 Testing
 
 ```bash
 # Unit tests
@@ -70,92 +163,115 @@ pnpm test
 # E2E tests
 pnpm test:e2e
 
-# Coverage
+# Test coverage
 pnpm test:cov
 ```
 
-## Build
+## 📦 Scripts Disponibles
 
 ```bash
-# Build para producción
-pnpm build
-
-# Ejecutar build
-pnpm start:prod
+pnpm dev                 # Desarrollo con hot-reload
+pnpm build              # Build para producción
+pnpm start:prod         # Ejecutar build de producción
+pnpm lint               # ESLint
+pnpm format             # Prettier
+pnpm prisma:generate    # Generar cliente Prisma
+pnpm prisma:migrate     # Ejecutar migraciones
+pnpm prisma:studio      # UI de base de datos
+pnpm db:reset           # Resetear base de datos (⚠️ borra todo)
 ```
 
-## Módulos principales
+## 🛠️ Setup & Verification Scripts
 
-### Auth
-- Registro y login
-- JWT tokens
-- OAuth (Google, Facebook, Apple)
-- Verificación de email/teléfono
+### Quick Start Script
+```bash
+./quick-start.sh
+```
+Automated setup that:
+- Installs dependencies
+- Checks .env configuration
+- Generates Prisma client
+- Runs database migrations
+- Verifies setup is complete
 
-### Users (Viajeros)
-- Perfiles sociales
-- Preferencias de viaje
-- Sistema de puntos y niveles
-- Galería "Capturado en Ruta"
+### Setup Verification
+```bash
+./verify-setup.sh
+```
+Checks your environment:
+- Node.js and pnpm versions
+- Dependencies installation
+- Environment variables
+- Database connection
+- Prisma client generation
+- TypeScript compilation
 
-### Experiences
-- CRUD de tours y experiencias
-- Calendario y disponibilidad
-- Pricing y variantes
+Use this to troubleshoot issues or verify your setup is correct.
 
-### Bookings
-- Creación de reservas
-- Pagos y splits
-- Cancelaciones y reembolsos
-- Gestión de documentos
+## 🔐 Autenticación
 
-### Social
-- Feed de publicaciones
-- Stories
-- Comentarios y reacciones
-- Chat real-time
+El sistema usa JWT con refresh tokens:
 
-### B2B
-- Directorio de proveedores
-- Acuerdos y tarifas netas
-- Órdenes B2B
+1. Login/Register → Retorna `accessToken` y `refreshToken`
+2. Usar `accessToken` en header: `Authorization: Bearer <token>`
+3. Cuando expire, usar `/api/v1/auth/refresh` con `refreshToken`
+4. Los tokens se almacenan en la base de datos
 
-## Base de datos
+## 🌍 Variables de Entorno
 
-### PostgreSQL (Relacional)
-- Usuarios y autenticación
-- Tours, hoteles, servicios
-- Reservas y transacciones
-- Sistema de puntos
-- Relaciones B2B
+Ver `.env.example` para todas las variables disponibles.
 
-### MongoDB (NoSQL)
-- Feed social
-- Comentarios y reacciones
-- Chat y mensajería
-- Logs
+Principales:
+- `PORT` - Puerto del servidor (default: 4000)
+- `DATABASE_URL` - URL de PostgreSQL
+- `JWT_SECRET` - Secret para access token
+- `JWT_REFRESH_SECRET` - Secret para refresh token
+- `REDIS_HOST` - Host de Redis (opcional)
+- `REDIS_PORT` - Puerto de Redis (opcional)
 
-### Redis (Caché)
-- Sesiones
-- Rate limiting
-- Real-time presence
-- Job queues
+## 🚧 Estado del Proyecto
 
-## Seguridad
+### ✅ Completado
+- Estructura base de NestJS
+- Autenticación JWT completa
+- Módulo de Users
+- Módulo de Experiences (CRUD)
+- Schema de Prisma completo
+- Documentación Swagger
 
-- Helmet para headers seguros
-- CORS configurado
-- Rate limiting
-- Validación estricta de inputs (class-validator)
-- Password hashing con bcrypt
-- JWT con refresh tokens
+### 🚧 En Desarrollo / Pendiente
+- Implementar Bookings completo
+- Sistema de pagos con Stripe
+- Reviews y ratings completo
+- Posts y red social completo
+- Chat WebSocket en tiempo real
+- Upload de imágenes con Cloudinary
+- Envío de emails
+- Testing completo
+- CI/CD
 
-## Documentación API
+## 🤝 Próximos Pasos
 
-La documentación interactiva está disponible en `/api/docs` cuando el servidor está corriendo.
+1. **Terminar implementación de módulos**
+   - Bookings con integración de Stripe
+   - Reviews y ratings
+   - Posts (likes, comments)
+   - Chat en tiempo real
 
-## Variables de entorno
+2. **Configurar servicios externos**
+   - Cloudinary para imágenes
+   - Stripe para pagos
+   - Nodemailer para emails
 
-Ver `.env.example` para todas las variables necesarias.
+3. **Testing**
+   - Unit tests
+   - E2E tests
+   - Coverage > 80%
 
-**Importante:** Nunca commitear el archivo `.env` real.
+4. **Deploy**
+   - Deploy en Railway/Render
+   - CI/CD con GitHub Actions
+
+---
+
+**¡El backend está listo para desarrollar!** 🚀

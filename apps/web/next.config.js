@@ -3,9 +3,6 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 
-  // Transpile packages from monorepo
-  transpilePackages: ['@viajero-conectado/shared', '@viajero-conectado/types'],
-
   // Image optimization
   images: {
     remotePatterns: [
@@ -48,7 +45,7 @@ const nextConfig = {
     serverActions: {
       allowedOrigins: ['localhost:3000'],
     },
-    optimizeCss: true,
+    // optimizeCss: true, // Disabled - requires 'critters' package
     optimizePackageImports: ['@tanstack/react-query', 'framer-motion', 'zustand', 'date-fns'],
   },
 

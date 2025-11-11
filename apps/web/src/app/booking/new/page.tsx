@@ -383,7 +383,7 @@ export default function NewBookingPage() {
                       <span className="font-medium">{formatCurrency(subtotal)}</span>
                     </div>
 
-                    {watchPointsToUse > 0 && (
+                    {watchPointsToUse && watchPointsToUse > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Descuento por puntos</span>
                         <span className="text-green-600">

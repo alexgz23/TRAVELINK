@@ -1,40 +1,19 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { MongooseModule } from '@nestjs/mongoose';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { CacheModule } from '@nestjs/cache-manager';
-import { BullModule } from '@nestjs/bull';
-import { APP_GUARD, APP_FILTER } from '@nestjs/core';
-
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { getTypeOrmConfig } from './config/typeorm.config';
-import { redisConfig } from './config/redis.config';
-import { bullConfig } from './config/bull.config';
-import { JwtAuthGuard, RolesGuard } from './common/guards';
-import { HttpExceptionFilter } from './common/filters';
-import { LoggerModule } from './common/logger/logger.module';
-import { CacheServiceModule } from './common/cache/cache.module';
-import { HealthModule } from './health/health.module';
-import { EmailQueueModule } from './queues/email/email-queue.module';
-import { NotificationsQueueModule } from './queues/notifications/notifications-queue.module';
-
-// Feature modules
-import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
-import { ExperiencesModule } from './modules/experiences/experiences.module';
-import { BookingsModule } from './modules/bookings/bookings.module';
-import { PaymentsModule } from './modules/payments/payments.module';
-import { SocialModule } from './modules/social/social.module';
-import { PointsModule } from './modules/points/points.module';
-import { AdsModule } from './modules/ads/ads.module';
-import { B2BModule } from './modules/b2b/b2b.module';
-import { NotificationsModule } from './modules/notifications/notifications.module';
-import { ReviewsModule } from './modules/reviews/reviews.module';
-import { ChatModule } from './modules/chat/chat.module';
-import { MediaModule } from './media/media.module';
-import { SearchModule } from './search/search.module';
+import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { PrismaModule } from './common/prisma/prisma.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { ExperiencesModule } from './experiences/experiences.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { PaymentsModule } from './payments/payments.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { PostsModule } from './posts/posts.module';
+import { ChatModule } from './chat/chat.module';
+import { UploadsModule } from './uploads/uploads.module';
+import { GamificationModule } from './gamification/gamification.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -44,82 +23,34 @@ import { SearchModule } from './search/search.module';
       envFilePath: '.env',
     }),
 
-    // Database - PostgreSQL
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => getTypeOrmConfig(configService),
-    }),
-
-    // Database - MongoDB
-    MongooseModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get('MONGODB_URI') || 'mongodb://localhost:27017/viajero-conectado',
-      }),
-    }),
-
-    // Cache - Redis
-    CacheModule.registerAsync(redisConfig),
-
-    // Queues - Bull
-    BullModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: bullConfig,
-    }),
-
-    // Rate limiting
+    // Rate Limiting
     ThrottlerModule.forRoot([
       {
-        ttl: 60000, // 1 minuto
-        limit: 100, // 100 requests
+        ttl: 60000, // 60 seconds
+        limit: 10, // 10 requests per minute
       },
     ]),
 
-    // Logging
-    LoggerModule,
+    // Database
+    PrismaModule,
 
-    // Cache Service
-    CacheServiceModule,
-
-    // Health check
-    HealthModule,
-
-    // Queue modules
-    EmailQueueModule,
-    NotificationsQueueModule,
-
-    // Feature modules
+    // Feature Modules
     AuthModule,
     UsersModule,
     ExperiencesModule,
     BookingsModule,
     PaymentsModule,
-    SocialModule,
-    PointsModule,
-    AdsModule,
-    B2BModule,
-    NotificationsModule,
     ReviewsModule,
+    PostsModule,
     ChatModule,
-    MediaModule,
-    SearchModule,
+    UploadsModule,
+    GamificationModule,
   ],
-  controllers: [AppController],
+  controllers: [HealthController],
   providers: [
-    AppService,
-    // Global guards
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-    // Global filters
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      useClass: ThrottlerGuard,
     },
   ],
 })

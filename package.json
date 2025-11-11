@@ -2,45 +2,23 @@
   "name": "viajero-conectado",
   "version": "0.1.0",
   "private": true,
-  "description": "Red social + marketplace de viajes + ecosistema B2B",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "description": "Viajero Conectado - Red social + marketplace de viajes (Full Stack)",
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "test": "turbo run test",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "clean": "turbo run clean && rm -rf node_modules",
-    "prepare": "husky install"
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "eslint": "^8.50.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-import": "^2.29.0",
-    "husky": "^8.0.0",
-    "lint-staged": "^15.0.0",
-    "prettier": "^3.0.0",
-    "turbo": "^1.10.0",
-    "typescript": "^5.2.0"
+    "install:all": "pnpm install && cd apps/web && pnpm install && cd ../backend && pnpm install",
+    "dev:web": "cd apps/web && pnpm dev",
+    "dev:backend": "cd apps/backend && pnpm dev",
+    "build:web": "cd apps/web && pnpm build",
+    "build:backend": "cd apps/backend && pnpm build",
+    "start:web": "cd apps/web && pnpm start",
+    "start:backend": "cd apps/backend && pnpm start:prod",
+    "lint": "cd apps/web && pnpm lint && cd ../backend && pnpm lint",
+    "test": "cd apps/web && pnpm test && cd ../backend && pnpm test",
+    "prisma:studio": "cd apps/backend && pnpm prisma:studio",
+    "prisma:migrate": "cd apps/backend && pnpm prisma:migrate"
   },
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
   },
-  "packageManager": "pnpm@8.10.0",
-  "dependencies": {
-    "@bull-board/api": "^6.14.1",
-    "@bull-board/express": "^6.14.1",
-    "@nestjs/bull": "^11.0.4",
-    "@nestjs/cache-manager": "^3.0.1",
-    "bull": "^4.16.5",
-    "cache-manager": "^7.2.4",
-    "cache-manager-redis-yet": "^5.1.5",
-    "redis": "^5.9.0"
-  }
+  "packageManager": "pnpm@8.10.0"
 }

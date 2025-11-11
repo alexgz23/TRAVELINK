@@ -4,50 +4,50 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
-  Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(HttpExceptionFilter.name);
-
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest();
     const status = exception.getStatus();
     const exceptionResponse = exception.getResponse();
 
-    const errorResponse = {
+    const error =
+      typeof exceptionResponse === 'string'
+        ? { message: exceptionResponse }
+        : (exceptionResponse as object);
+
+    response.status(status).json({
+      ...error,
       statusCode: status,
       timestamp: new Date().toISOString(),
-      path: request.url,
-      method: request.method,
-      message:
-        typeof exceptionResponse === 'object' && 'message' in exceptionResponse
-          ? (exceptionResponse as any).message
-          : exception.message,
-      error:
-        typeof exceptionResponse === 'object' && 'error' in exceptionResponse
-          ? (exceptionResponse as any).error
-          : undefined,
-    };
+    });
+  }
+}
 
-    // Log de errores del servidor
-    if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
-      this.logger.error(
-        `${request.method} ${request.url}`,
-        exception.stack,
-        'HttpExceptionFilter',
-      );
-    } else {
-      this.logger.warn(
-        `${request.method} ${request.url} - ${exception.message}`,
-        'HttpExceptionFilter',
-      );
-    }
+@Catch()
+export class AllExceptionsFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
 
-    response.status(status).json(errorResponse);
+    const status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+
+    const message =
+      exception instanceof HttpException
+        ? exception.message
+        : 'Internal server error';
+
+    response.status(status).json({
+      statusCode: status,
+      message,
+      timestamp: new Date().toISOString(),
+    });
   }
 }

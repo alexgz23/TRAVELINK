@@ -1,442 +1,575 @@
 # Viajero Conectado
 
-**Red social + marketplace de viajes + ecosistema B2B**
+**Red social + marketplace de viajes en Colombia**
 
-Plataforma que conecta viajeros, agencias, hoteles, guías y conductores en un ecosistema completo de turismo.
+Plataforma web que conecta viajeros con experiencias turísticas, con backend API REST.
+
+![Status](https://img.shields.io/badge/status-development-yellow.svg)
+![Next.js](https://img.shields.io/badge/Next.js-14.2-black)
+![NestJS](https://img.shields.io/badge/NestJS-10-red)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue)
+
+---
+
+## 📋 Documentación Importante
+
+> **📌 NUEVO:** Documentación completa agregada para facilitar el setup y desarrollo
+
+- **[DATABASE_SETUP.md](DATABASE_SETUP.md)** - Guía completa de configuración de base de datos (4 opciones: Supabase, Neon, Railway, Local)
+- **[CURRENT_STATUS.md](CURRENT_STATUS.md)** - Estado detallado del proyecto, estadísticas y próximos pasos
+- **[ENVIRONMENT_RESTRICTIONS.md](ENVIRONMENT_RESTRICTIONS.md)** - Información sobre restricciones de entorno y soluciones
+- **[apps/backend/README.md](apps/backend/README.md)** - Documentación completa del backend
+- **[apps/web/DEPLOYMENT.md](apps/web/DEPLOYMENT.md)** - Guía de deployment del frontend
+
+### 🚀 Setup Rápido con Scripts Automatizados
+
+```bash
+# Backend - Setup automatizado (recomendado)
+cd apps/backend
+./quick-start.sh
+
+# Backend - Verificar configuración
+./verify-setup.sh
+```
+
+---
 
 ## 📊 Estado del Proyecto
 
-| Componente | Estado | Progreso |
-|------------|--------|----------|
-| **Backend Core** | ✅ Completo | 14/14 módulos (100%) |
-| **API Docs** | ✅ Completo | 14/14 APIs (100%) |
-| **Endpoints** | ✅ Completo | 200+ endpoints REST |
-| **Swagger/OpenAPI** | ✅ Completo | Documentación interactiva |
-| **Frontend Web** | ✅ Completo | Next.js 14 (100%) |
-| **Testing** | ✅ Completo | Unit + E2E (100%) |
-| **DevOps/CI-CD** | ✅ Completo | Docker + K8s + Actions (100%) |
-| **Mobile App** | 🟡 Base Lista | Config + Guía (40%) |
+| Componente | Estado | Descripción |
+|------------|--------|-------------|
+| **Frontend Web** | ✅ Completo | Next.js 14 con 10+ páginas funcionales (~3,763 líneas) |
+| **Backend API** | 🟡 Base Lista | NestJS + Prisma + PostgreSQL (core implementado ~620 líneas) |
+| **Base de Datos** | ✅ Configurada | Neon (PostgreSQL cloud) - Schema listo (12 modelos, 11 tablas) |
+| **Auth Sistema** | ✅ Completo | JWT con refresh tokens (~200 líneas) |
+| **Experiencias** | ✅ CRUD Completo | Búsqueda, filtros, gestión completa (~150 líneas) |
+| **Usuarios** | ✅ Completo | Perfiles, estadísticas (~120 líneas) |
+| **Bookings** | 🟡 Pendiente | Estructura creada (~50 líneas stub), lógica pendiente |
+| **Reviews** | 🟡 Pendiente | Estructura creada (~50 líneas stub), lógica pendiente |
+| **Posts** | 🟡 Pendiente | Estructura creada (~50 líneas stub), lógica pendiente |
+| **Chat** | 🟡 Pendiente | WebSocket configurado (~50 líneas stub), lógica pendiente |
+| **Uploads** | 🟡 Pendiente | Estructura creada (~50 líneas stub), lógica pendiente |
+| **Deploy** | ⚪ No iniciado | - |
 
-**Ver detalles:** [PROJECT_SUMMARY.md](./docs/PROJECT_SUMMARY.md) | [PLATFORM_OVERVIEW.md](./docs/PLATFORM_OVERVIEW.md)
-
----
-
-## Qué es Viajero Conectado
-
-Una plataforma integral que combina:
-
-- **Marketplace multivendedor:** Tours, paquetes, hoteles, guías, transporte y productos
-- **Red social de viajes:** Feed, stories, chat, rutas compartidas, reseñas
-- **Mapa y diario de viaje:** "Capturado en Ruta" - recuerdos, fotos y videos por viaje
-- **Programa de puntos y niveles:** Sistema de fidelización gamificado
-- **Alianzas B2B:** Agencias, hoteles, guías y conductores trabajando entre sí
-
-### Storytelling
-
-> "No es solo una web de tours. Es una red social de viajes donde cada historia, reseña, foto y reserva conecta viajeros, agencias y proveedores en un mismo ecosistema."
-
-**Origen:** Nace en Colombia, aprovechando la diversidad de destinos y culturas, pero pensado desde el inicio para Latinoamérica y el mundo.
+> **📊 Completitud estimada:** ~33% (Core backend + Frontend UI completo, features avanzadas pendientes)
+>
+> **Ver análisis detallado:** [CURRENT_STATUS.md](CURRENT_STATUS.md)
 
 ---
 
-## Stack Tecnológico
-
-### Backend
-- **Framework:** NestJS 10+ con TypeScript
-- **Bases de datos:**
-  - PostgreSQL (relacional)
-  - MongoDB (social)
-  - Redis (caché)
-- **Búsqueda:** Typesense
-- **Storage:** AWS S3 / Cloudflare R2
-- **Pagos:** Stripe + Mercado Pago
-
-### Frontend Web
-- **Framework:** Next.js 14 (App Router)
-- **Lenguaje:** TypeScript 5+
-- **Estilos:** TailwindCSS 3+
-- **Estado:** Zustand + TanStack Query
-
-### Mobile
-- **Framework:** React Native + Expo SDK 50
-- **Navegación:** Expo Router
-- **Estilos:** NativeWind
-
-### Infraestructura & DevOps
-- **Containerización:** Docker + Docker Compose
-- **Orquestación:** Kubernetes
-- **CI/CD:** GitHub Actions
-- **Reverse Proxy:** Nginx
-- **Monitoring:** Prometheus + Grafana
-- **Monorepo:** Turborepo
-- **Package Manager:** pnpm / npm
-
-Ver [TECH_STACK.md](./TECH_STACK.md) para más detalles.
-
----
-
-## Estructura del Proyecto
+## 🏗️ Arquitectura
 
 ```
-viajero-conectado/
+TRAVELINK/
 ├── apps/
-│   ├── backend/           # API NestJS
-│   ├── web/               # Frontend Next.js
-│   └── mobile/            # App React Native
-├── packages/
-│   ├── shared/            # Código compartido
-│   ├── types/             # TypeScript types
-│   ├── config/            # Configuraciones
-│   └── ui/                # Componentes UI compartidos
-├── docs/
-│   ├── architecture/      # Documentación de arquitectura
-│   ├── api/               # Documentación de API
-│   └── user-guides/       # Guías de usuario
-├── infrastructure/
-│   ├── docker/            # Dockerfiles
-│   └── scripts/           # Scripts de utilidad
-└── .github/
-    └── workflows/         # CI/CD
+│   ├── web/              # Frontend - Next.js 14
+│   │   ├── src/
+│   │   │   ├── app/      # App Router (rutas)
+│   │   │   ├── components/
+│   │   │   ├── hooks/
+│   │   │   ├── lib/
+│   │   │   └── styles/
+│   │   └── package.json
+│   │
+│   └── backend/          # Backend API - NestJS 10
+│       ├── src/
+│       │   ├── auth/     # ✅ Autenticación JWT
+│       │   ├── users/    # ✅ Gestión usuarios
+│       │   ├── experiences/  # ✅ CRUD experiencias
+│       │   ├── bookings/     # 🟡 Stub
+│       │   ├── reviews/      # 🟡 Stub
+│       │   ├── posts/        # 🟡 Stub
+│       │   ├── chat/         # 🟡 Stub
+│       │   ├── uploads/      # 🟡 Stub
+│       │   └── common/   # Utilidades compartidas
+│       ├── prisma/
+│       │   └── schema.prisma  # Schema de base de datos
+│       └── package.json
+│
+├── package.json
+└── README.md
 ```
 
 ---
 
-## Inicio Rápido
-
-> 🚀 **¿Primera vez?** Lee la [**Guía de Inicio Completa (GETTING_STARTED.md)**](./GETTING_STARTED.md) con instrucciones paso a paso para tener el proyecto corriendo en menos de 10 minutos.
+## 🚀 Inicio Rápido
 
 ### Prerrequisitos
 
-- **Node.js** 18+ ([Download](https://nodejs.org/))
+- **Node.js** 18+ ([Descargar](https://nodejs.org/))
 - **pnpm** 8+ (`npm install -g pnpm`)
-- **Docker Desktop** ([Download](https://www.docker.com/products/docker-desktop))
-- **Git** ([Download](https://git-scm.com/))
+- **Base de Datos:** PostgreSQL (Neon/Supabase/Railway/Local)
 
-### Instalación
+> **✅ Base de datos YA configurada:** Este proyecto usa Neon (PostgreSQL cloud). El connection string ya está en `.env`.
 
-1. **Clonar el repositorio**
+### 1. Clonar repositorio
 
 ```bash
-git clone https://github.com/tu-org/viajero-conectado.git
-cd viajero-conectado
+git clone <tu-repo-url>
+cd TRAVELINK
 ```
 
-2. **Ejecutar setup automático**
+### 2. Setup Automático del Backend (Recomendado)
 
 ```bash
-chmod +x infrastructure/scripts/dev-setup.sh
-./infrastructure/scripts/dev-setup.sh
-```
-
-Este script:
-- Verifica Docker
-- Instala pnpm si es necesario
-- Copia archivos `.env`
-- Instala dependencias
-- Levanta servicios de Docker
-
-3. **Iniciar servicios**
-
-```bash
-# Terminal 1 - Backend
 cd apps/backend
-pnpm dev
 
-# Terminal 2 - Frontend Web
-cd apps/web
-pnpm dev
-
-# Terminal 3 - Mobile (opcional)
-cd apps/mobile
-pnpm start
-```
-
-4. **Acceder a la aplicación**
-
-- **Frontend Web:** http://localhost:3000
-- **Backend API:** http://localhost:4000
-- **API Docs:** http://localhost:4000/api/docs
-- **MinIO Console:** http://localhost:9001
-- **Mailhog (emails):** http://localhost:8025
-
----
-
-## Desarrollo
-
-### Comandos Útiles
-
-```bash
 # Instalar dependencias
 pnpm install
 
-# Desarrollo (todos los proyectos)
-pnpm dev
-
-# Build (todos los proyectos)
-pnpm build
-
-# Tests
-pnpm test
-
-# Linting
-pnpm lint
-
-# Format
-pnpm format
-
-# Clean
-pnpm clean
+# Ejecutar script de setup automático
+./quick-start.sh
 ```
 
-### Servicios Docker
+El script `quick-start.sh` hará:
+- ✅ Instalar dependencias
+- ✅ Verificar configuración `.env`
+- ✅ Generar Prisma client
+- ✅ Ejecutar migraciones (crear 11 tablas en Neon)
+- ✅ Verificar que todo funciona
+
+### 2B. Setup Manual del Backend (Alternativa)
 
 ```bash
-# Iniciar servicios
-docker-compose up -d
-
-# Ver logs
-docker-compose logs -f
-
-# Detener servicios
-docker-compose down
-
-# Detener y eliminar volúmenes (datos)
-docker-compose down -v
-
-# Ver estado
-docker-compose ps
-```
-
-### Base de Datos
-
-```bash
-# Ejecutar migraciones
 cd apps/backend
-pnpm run migration:run
 
-# Crear nueva migración
-pnpm run migration:create -- nombre-migracion
+# Instalar dependencias
+pnpm install
 
-# Revertir última migración
-pnpm run migration:revert
+# La configuración ya está en .env (Neon PostgreSQL)
+# Verificar DATABASE_URL está configurado
+cat .env | grep DATABASE_URL
 
-# Seed de datos de prueba
-pnpm run seed
+# Generar cliente Prisma
+pnpm prisma generate
+
+# Ejecutar migraciones (crear tablas)
+pnpm prisma migrate dev --name init
+
+# Verificar tablas creadas
+pnpm prisma studio
+# Abre http://localhost:5555 - deberías ver 11 tablas
 ```
 
----
+> **💡 ¿Problemas con Prisma?** Ver [ENVIRONMENT_RESTRICTIONS.md](ENVIRONMENT_RESTRICTIONS.md) para troubleshooting.
+>
+> **📚 Configurar otra base de datos:** Ver [DATABASE_SETUP.md](DATABASE_SETUP.md) para instrucciones detalladas de Supabase, Railway o PostgreSQL local.
 
-## Arquitectura
-
-El proyecto usa una arquitectura **monolito modular** para el backend, preparada para escalar a microservicios.
-
-### Módulos Principales
-
-1. ✅ **Auth Module** - Autenticación y autorización JWT
-2. ✅ **Users Module** - Gestión de usuarios y perfiles multi-rol
-3. ✅ **Experiences Module** - Tours y experiencias turísticas
-4. ✅ **Bookings Module** - Sistema de reservas con estados completos
-5. ✅ **Payments Module** - Procesamiento de pagos multi-método
-6. ✅ **Social Module** - Red social con posts, comentarios, likes, follows
-7. ✅ **Points Module** - Sistema de puntos y gamificación con 5 niveles
-8. ✅ **Ads Module** - Plataforma publicitaria tipo Facebook Ads (CPC/CPM)
-9. ✅ **B2B Module** - Alianzas estratégicas con contratos y comisiones
-10. ✅ **Notifications Module** - Notificaciones multi-canal (In-App, Email, Push, SMS)
-11. ✅ **Reviews Module** - Reseñas y calificaciones con moderación
-12. ✅ **Chat Module** - Mensajería real-time con WebSocket (Socket.IO)
-13. ✅ **Media Module** - Gestión de multimedia con procesamiento de imágenes/videos
-14. ✅ **Search Module** - Búsqueda avanzada con Typesense
-
-Ver [docs/PLATFORM_OVERVIEW.md](./docs/PLATFORM_OVERVIEW.md) para documentación completa.
-
----
-
-## Roles de Usuario
-
-La plataforma soporta múltiples tipos de usuarios:
-
-### Viajero
-- Buscar y reservar experiencias
-- Red social de viajes
-- Sistema de puntos
-- "Capturado en Ruta" (galería)
-
-### Agencia de Viajes
-- Gestión de productos turísticos
-- Calendario y cupos
-- Ventas B2C y B2B
-- Reportes financieros
-
-### Hotel / Alojamiento
-- Inventario de habitaciones
-- Tarifas dinámicas
-- Reservas directas y B2B
-- Reputación
-
-### Guía Turístico
-- Perfil profesional
-- Agenda de servicios
-- Alianzas B2B con agencias
-- Reseñas
-
-### Conductor / Transporte
-- Gestión de flota
-- Rutas y servicios
-- Alianzas B2B
-- Seguimiento
-
-Ver documentación completa en [docs/](./docs/).
-
----
-
-## Testing
+### 3. Configurar Frontend
 
 ```bash
-# Backend (Jest)
-cd apps/backend
-pnpm test
-pnpm test:e2e
-pnpm test:cov
-
-# Frontend Web (Vitest)
 cd apps/web
-pnpm test
-pnpm test:ui
 
-# Mobile (Jest)
-cd apps/mobile
-pnpm test
+# Instalar dependencias
+pnpm install
+
+# Copiar variables de entorno
+cp .env.example .env.local
+
+# Editar .env.local (ya tiene valores por defecto correctos)
+# NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
 ```
 
----
+### 4. Iniciar aplicaciones
 
-## Despliegue
-
-### Docker Compose (Desarrollo Local)
-
+**Terminal 1 - Backend:**
 ```bash
-# Iniciar todos los servicios
-docker-compose up -d
-
-# Ver logs
-docker-compose logs -f backend frontend
-
-# Detener
-docker-compose down
+cd apps/backend
+pnpm dev
 ```
 
-### Docker Compose (Producción)
-
+**Terminal 2 - Frontend:**
 ```bash
-# Build y deploy
-docker-compose -f docker-compose.prod.yml up -d
-
-# Escalar servicios
-docker-compose -f docker-compose.prod.yml up -d --scale backend=3 --scale frontend=3
+cd apps/web
+pnpm dev
 ```
 
-### Kubernetes
+### 5. Acceder a la aplicación
+
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:4000
+- **API Docs (Swagger):** http://localhost:4000/api/docs
+- **Health Check:** http://localhost:4000/api/v1/health
+- **Prisma Studio (DB UI):** http://localhost:5555 (ejecutar `pnpm prisma studio`)
+
+### 6. Verificar que todo funciona
 
 ```bash
-# Aplicar todos los manifests
-kubectl apply -f infrastructure/kubernetes/
-
-# Ver estado
-kubectl get pods -n viajero-conectado
-kubectl get services -n viajero-conectado
-kubectl get ingress -n viajero-conectado
-```
-
-Ver [infrastructure/kubernetes/README.md](infrastructure/kubernetes/README.md) para más detalles.
-
-### CI/CD (GitHub Actions)
-
-El proyecto incluye workflows automatizados:
-
-- **backend-ci.yml**: Lint, test, build, Docker push
-- **frontend-ci.yml**: Lint, test, E2E, build, deploy Vercel
-- **deploy-production.yml**: Deployment a Kubernetes/Swarm
-- **code-quality.yml**: Security scans, CodeQL, SonarCloud
-
-### Desarrollo
-- **Backend:** Railway / Render / Docker
-- **Frontend:** Vercel / Netlify
-- **Bases de datos:** Docker local / Railway
-
-### Producción
-- **Backend:** Kubernetes / AWS ECS / Docker Swarm
-- **Frontend:** Vercel (Edge) / Netlify
-- **Bases de datos:** AWS RDS + MongoDB Atlas
-- **Storage:** AWS S3 + CloudFront CDN
-- **Search:** Elasticsearch Cloud
-
-Ver [apps/web/DEPLOYMENT.md](apps/web/DEPLOYMENT.md) para guías detalladas.
-
----
-
-## Variables de Entorno
-
-Cada aplicación tiene su archivo `.env.example`:
-
-- `apps/backend/.env.example`
-- `apps/web/.env.example`
-- `apps/mobile/.env.example`
-
-**Importante:** Nunca commitear archivos `.env` reales.
-
----
-
-## 📊 Monitoring y Observabilidad
-
-### Prometheus (Métricas)
-
-Acceder a: `http://localhost:9090`
-
-Métricas disponibles:
-- HTTP request duration & total
-- Database connection pool metrics
-- Redis operations & cache hit/miss ratio
-- Application-specific business metrics
-
-### Grafana (Visualización)
-
-Acceder a: `http://localhost:3001`
-- **Usuario**: admin
-- **Password**: admin (cambiar en producción)
-
-Dashboards incluidos:
-- **Application Overview**: Estado general del sistema
-- **API Performance**: Latencias y throughput
-- **Database Metrics**: Pool connections, query performance
-- **System Resources**: CPU, memoria, disco, red
-
-### Logs
-
-```bash
-# Logs de Docker Compose
-docker-compose logs -f [service-name]
-
-# Logs de Kubernetes
-kubectl logs -f deployment/viajero-backend -n viajero-conectado
-kubectl logs -f deployment/viajero-frontend -n viajero-conectado
-```
-
-### Health Checks
-
-```bash
-# Backend health
+# Terminal 3 - Verificar backend
 curl http://localhost:4000/api/v1/health
+# Debería retornar: {"status":"ok","timestamp":"..."}
 
-# Frontend health
-curl http://localhost:3000/api/health
-
-# Nginx status
-curl http://localhost:8080/nginx_status
+# Verificar base de datos
+cd apps/backend
+./verify-setup.sh
+# Debería mostrar todos los checks en verde ✓
 ```
 
 ---
 
-## Contribuir
+## 🛠️ Stack Tecnológico
+
+### Frontend
+- **Framework:** Next.js 14 (App Router)
+- **Lenguaje:** TypeScript 5
+- **Estilos:** Tailwind CSS 3
+- **Estado:** Zustand
+- **Data Fetching:** TanStack Query v5
+- **Formularios:** React Hook Form + Zod
+- **Animaciones:** Framer Motion
+
+### Backend
+- **Framework:** NestJS 10
+- **Lenguaje:** TypeScript 5
+- **ORM:** Prisma
+- **Base de datos:** PostgreSQL 15
+- **Caché:** Redis 7 (opcional)
+- **Auth:** JWT + Passport
+- **Validación:** class-validator
+- **Docs:** Swagger/OpenAPI
+
+### DevOps
+- **Package Manager:** pnpm
+- **Version Control:** Git
+
+---
+
+## 📚 API Endpoints
+
+### Auth
+- `POST /api/v1/auth/register` - Registrar usuario
+- `POST /api/v1/auth/login` - Iniciar sesión
+- `POST /api/v1/auth/refresh` - Refrescar token
+- `POST /api/v1/auth/logout` - Cerrar sesión
+- `GET /api/v1/auth/me` - Usuario actual
+
+### Users
+- `GET /api/v1/users/profile` - Perfil del usuario
+- `PUT /api/v1/users/profile` - Actualizar perfil
+- `GET /api/v1/users/stats` - Estadísticas
+- `GET /api/v1/users/:id` - Ver usuario
+
+### Experiences
+- `GET /api/v1/experiences` - Listar experiencias (con filtros)
+- `GET /api/v1/experiences/:id` - Detalle de experiencia
+- `POST /api/v1/experiences` - Crear (PROVIDER only)
+- `PUT /api/v1/experiences/:id` - Actualizar
+- `DELETE /api/v1/experiences/:id` - Eliminar (soft delete)
+
+### Bookings, Reviews, Posts, Chat, Uploads
+🟡 **En desarrollo** - Estructura creada, lógica pendiente
+
+**Ver documentación completa:** http://localhost:4000/api/docs
+
+---
+
+## 🗄️ Base de Datos
+
+### Modelos (Prisma Schema)
+
+1. **User** - Usuarios (TRAVELER, PROVIDER, ADMIN)
+2. **RefreshToken** - Tokens JWT
+3. **Experience** - Experiencias turísticas
+4. **Booking** - Reservas
+5. **Review** - Reseñas y ratings
+6. **Post** - Red social
+7. **Like** - Likes en posts
+8. **Comment** - Comentarios
+9. **Conversation** - Conversaciones
+10. **ConversationParticipant** - Participantes de chat
+11. **Message** - Mensajes de chat
+
+**Schema completo:** `apps/backend/prisma/schema.prisma`
+
+### Comandos Prisma
+
+```bash
+cd apps/backend
+
+# Generar cliente
+pnpm prisma:generate
+
+# Crear migración
+pnpm prisma:migrate
+
+# Ver base de datos (GUI)
+pnpm prisma:studio
+
+# Resetear DB (⚠️ elimina datos)
+pnpm db:reset
+```
+
+---
+
+## 🧪 Testing
+
+### Frontend
+```bash
+cd apps/web
+
+# Tests unitarios
+pnpm test
+
+# Tests E2E
+pnpm test:e2e
+
+# Coverage
+pnpm test:coverage
+```
+
+### Backend
+```bash
+cd apps/backend
+
+# Tests unitarios
+pnpm test
+
+# Tests E2E
+pnpm test:e2e
+
+# Coverage
+pnpm test:cov
+```
+
+---
+
+## 📜 Scripts Disponibles
+
+### Raíz del Proyecto
+```bash
+# Instalar todas las dependencias
+pnpm install:all
+
+# Desarrollo
+pnpm dev:web           # Solo frontend
+pnpm dev:backend       # Solo backend
+
+# Build
+pnpm build:web
+pnpm build:backend
+
+# Producción
+pnpm start:web
+pnpm start:backend
+
+# Testing y linting
+pnpm lint
+pnpm test
+
+# Prisma
+pnpm prisma:studio
+pnpm prisma:migrate
+```
+
+### Frontend (`apps/web/`)
+```bash
+pnpm dev              # Desarrollo (puerto 3000)
+pnpm build            # Build producción
+pnpm start            # Ejecutar build
+pnpm lint             # ESLint
+pnpm type-check       # TypeScript
+pnpm test             # Tests unitarios
+pnpm test:e2e         # Tests E2E
+```
+
+### Backend (`apps/backend/`)
+```bash
+pnpm dev              # Desarrollo (puerto 4000)
+pnpm build            # Build producción
+pnpm start:prod       # Ejecutar build
+pnpm lint             # ESLint
+pnpm test             # Tests
+pnpm prisma:studio    # DB UI
+```
+
+---
+
+## 🔐 Variables de Entorno
+
+### Frontend (`.env.local`)
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+NEXT_PUBLIC_WS_URL=ws://localhost:4000
+NEXT_PUBLIC_APP_NAME=Viajero Conectado
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### Backend (`.env`)
+
+```env
+NODE_ENV=development
+PORT=4000
+
+# PostgreSQL
+DATABASE_URL="postgresql://postgres:password@localhost:5432/viajero_conectado?schema=public"
+
+# Redis (opcional)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# JWT
+JWT_SECRET=your-secret-key-change-in-production
+JWT_REFRESH_SECRET=your-refresh-secret-key
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_EXPIRES_IN=30d
+```
+
+**Ver:** `apps/backend/.env.example` para todas las variables
+
+---
+
+## 🚧 Roadmap
+
+### ✅ Completado
+
+- [x] Frontend web con Next.js 14
+- [x] Backend con NestJS 10
+- [x] Base de datos PostgreSQL + Prisma
+- [x] Sistema de autenticación JWT
+- [x] CRUD de usuarios
+- [x] CRUD de experiencias
+- [x] Documentación Swagger
+
+### 🔄 En Desarrollo
+
+- [ ] Sistema de reservas (Bookings)
+- [ ] Integración de pagos (Stripe/PayU)
+- [ ] Sistema de reseñas (Reviews)
+- [ ] Red social (Posts, Likes, Comments)
+- [ ] Chat en tiempo real (WebSocket)
+- [ ] Upload de imágenes (Cloudinary/S3)
+
+### 📅 Próximamente
+
+- [ ] Sistema de puntos y gamificación
+- [ ] Notificaciones (Email, Push, In-App)
+- [ ] Panel de administración
+- [ ] Analytics y reportes
+- [ ] Testing completo (>80% coverage)
+- [ ] Deploy a producción
+- [ ] App móvil (React Native)
+
+---
+
+## 📖 Documentación
+
+### Guías de Setup
+- **[DATABASE_SETUP.md](DATABASE_SETUP.md)** - Configuración completa de base de datos (4 opciones)
+- **[CURRENT_STATUS.md](CURRENT_STATUS.md)** - Estado actual del proyecto, estadísticas y roadmap
+- **[ENVIRONMENT_RESTRICTIONS.md](ENVIRONMENT_RESTRICTIONS.md)** - Troubleshooting de entorno
+
+### Documentación de Aplicaciones
+- **[apps/backend/README.md](apps/backend/README.md)** - Backend: API, endpoints, scripts
+- **[apps/web/README.md](apps/web/README.md)** - Frontend: componentes, páginas, hooks
+- **[apps/web/DEPLOYMENT.md](apps/web/DEPLOYMENT.md)** - Deployment del frontend (Vercel, Netlify)
+
+### Documentación Interactiva
+- **API Docs (Swagger):** http://localhost:4000/api/docs
+- **Prisma Studio:** http://localhost:5555 (ejecutar `pnpm prisma studio`)
+
+---
+
+## 🐛 Troubleshooting
+
+> **📚 Guía completa:** Ver [ENVIRONMENT_RESTRICTIONS.md](ENVIRONMENT_RESTRICTIONS.md) para troubleshooting detallado
+
+### Script de Verificación Automática
+
+```bash
+cd apps/backend
+./verify-setup.sh
+```
+
+Este script verifica:
+- ✅ Node.js y pnpm versiones
+- ✅ Dependencias instaladas
+- ✅ Variables de entorno configuradas
+- ✅ Conexión a base de datos
+- ✅ Prisma client generado
+- ✅ TypeScript compila sin errores
+
+### Problemas Comunes
+
+**1. Prisma binary download bloqueado (403 Forbidden)**
+```bash
+# Solución: Usar base de datos cloud (Neon, Supabase, Railway)
+# Ya configurado con Neon en este proyecto
+```
+Ver [ENVIRONMENT_RESTRICTIONS.md](ENVIRONMENT_RESTRICTIONS.md) para más detalles.
+
+**2. No puede conectar a base de datos**
+```bash
+# Verificar DATABASE_URL en .env
+cat apps/backend/.env | grep DATABASE_URL
+
+# Probar conexión
+cd apps/backend
+pnpm prisma db execute --stdin <<< "SELECT 1;"
+```
+
+**3. Puerto ya en uso**
+```bash
+# Backend (4000)
+lsof -ti:4000 | xargs kill -9
+
+# Frontend (3000)
+lsof -ti:3000 | xargs kill -9
+```
+
+**4. Problemas con Prisma**
+```bash
+cd apps/backend
+
+# Regenerar cliente
+pnpm prisma generate
+
+# Resetear migraciones
+rm -rf prisma/migrations
+pnpm prisma migrate dev --name init
+```
+
+**5. Problemas con dependencias**
+```bash
+# Eliminar node_modules y reinstalar
+rm -rf node_modules apps/*/node_modules
+pnpm install
+```
+
+---
+
+## 💡 Servicios de Base de Datos
+
+> **✅ Este proyecto ya usa Neon** - connection string configurado en `apps/backend/.env`
+
+### PostgreSQL Cloud (Gratis para desarrollo)
+
+1. **Neon** (✅ En uso)
+   - URL: https://neon.tech
+   - Tier gratuito: Proyectos ilimitados
+   - Serverless PostgreSQL
+   - **En uso en este proyecto**
+
+2. **Supabase** (Alternativa)
+   - URL: https://supabase.com
+   - Tier gratuito: 500MB, 2GB de transferencia
+   - Incluye: PostgreSQL + UI + Storage + Auth
+
+3. **Railway** (Alternativa)
+   - URL: https://railway.app
+   - Tier gratuito: $5/mes de créditos
+   - Deploy fácil
+
+**Ver guía completa:** [DATABASE_SETUP.md](DATABASE_SETUP.md) para instrucciones paso a paso de cada opción.
+
+### Redis Cloud (Opcional - No configurado)
+
+- **Upstash:** https://upstash.com (gratis 10k comandos/día)
+- **Redis Cloud:** https://redis.com/try-free/ (30MB gratis)
+
+---
+
+## 🤝 Contribuir
 
 1. Fork el proyecto
 2. Crea tu feature branch (`git checkout -b feature/AmazingFeature`)
@@ -444,106 +577,19 @@ curl http://localhost:8080/nginx_status
 4. Push al branch (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
-Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
-
 ---
 
-## Roadmap
-
-### Fase 1 - Backend Core (✅ COMPLETADA)
-- [x] Arquitectura base modular NestJS
-- [x] Módulos core (Auth, Users, Experiences, Bookings, Payments)
-- [x] Red social completa (posts, comentarios, likes, follows)
-- [x] Sistema de puntos y gamificación (5 niveles)
-- [x] Plataforma publicitaria (CPC/CPM)
-- [x] Alianzas B2B con contratos y comisiones
-- [x] Sistema de notificaciones multi-canal (In-App, Email, Push, SMS)
-- [x] Reseñas y calificaciones con moderación
-- [x] Chat en tiempo real con WebSocket (Socket.IO)
-- [x] Gestión de multimedia con procesamiento de imágenes/videos
-- [x] Búsqueda avanzada con Typesense
-- [x] Documentación completa de 14 APIs (200+ endpoints)
-- [x] Swagger/OpenAPI interactivo
-- [x] Sistema de seguridad (JWT, RBAC, Rate Limiting)
-
-### Fase 2 - Frontend & Testing (✅ COMPLETADA)
-- [x] Tests unitarios backend (Jest)
-- [x] Tests E2E backend
-- [x] Frontend web Next.js 14 con App Router
-- [x] Tests unitarios frontend (Vitest)
-- [x] Tests E2E frontend (Playwright - 27 tests)
-- [x] UI/UX Design System con Tailwind CSS
-- [x] Integración pagos (Wompi - Card + PSE)
-- [x] SEO optimizations (meta tags, sitemap, structured data)
-- [x] PWA configuration
-- [x] Performance optimizations (Web Vitals tracking)
-- [x] DevOps: Docker, Kubernetes, CI/CD
-- [x] App móvil React Native - Configuración base y guía de implementación
-
-### Fase 3 - Expansión LATAM (Q2-Q3 2025)
-- [ ] Multi-idioma (ES, EN, PT)
-- [ ] Multi-moneda
-- [ ] B2B completo
-- [ ] Apps para guías y conductores
-- [ ] Analytics avanzado
-- [ ] Marketing automation
-
-### Fase 4 - Global (Q4 2025+)
-- [ ] Internacionalización completa
-- [ ] Machine Learning (recomendaciones)
-- [ ] API pública para partners
-- [ ] Programa de afiliados
-- [ ] White-label para agencias
-
----
-
-## Documentación
-
-### General
-- [Resumen de la Plataforma](./docs/PLATFORM_OVERVIEW.md) - Visión general completa
-- [Stack Tecnológico](./TECH_STACK.md) - Tecnologías utilizadas
-- [Arquitectura](./docs/architecture/ARCHITECTURE.md) - Diseño del sistema
-- [Esquema de DB](./docs/architecture/DATABASE_SCHEMA.md) - Estructura de datos
-
-### APIs Documentadas (100% Completas)
-
-**Core APIs:**
-- [Auth API](./docs/api/AUTH_API.md) - Autenticación JWT y gestión de sesiones (7 endpoints)
-- [Users API](./docs/api/USERS_API.md) - Gestión de usuarios y perfiles (6 endpoints)
-- [Experiences API](./docs/api/EXPERIENCES_API.md) - Marketplace de tours (17 endpoints)
-- [Bookings API](./docs/api/BOOKINGS_API.md) - Sistema de reservas (13 endpoints)
-- [Payments API](./docs/api/PAYMENTS_API.md) - Procesamiento de pagos (9 endpoints)
-
-**Ecosystem APIs:**
-- [Social API](./docs/api/SOCIAL_API.md) - Red social de viajes (20+ endpoints)
-- [Points API](./docs/api/POINTS_API.md) - Sistema de puntos y gamificación (15+ endpoints)
-- [Ads API](./docs/api/ADS_API.md) - Plataforma publicitaria CPC/CPM (23+ endpoints)
-- [B2B API](./docs/api/B2B_API.md) - Alianzas estratégicas (20+ endpoints)
-- [Notifications API](./docs/api/NOTIFICATIONS_API.md) - Notificaciones multi-canal (18+ endpoints)
-- [Reviews API](./docs/api/REVIEWS_API.md) - Reseñas y calificaciones (16+ endpoints)
-- [Chat API](./docs/api/CHAT_API.md) - Mensajería en tiempo real con WebSocket (12+ endpoints)
-- [Media API](./docs/api/MEDIA_API.md) - Gestión y procesamiento de multimedia (8+ endpoints)
-- [Search API](./docs/api/SEARCH_API.md) - Búsqueda avanzada con Typesense (10+ endpoints)
-
-**Total:** 200+ endpoints REST + WebSocket documentados
-
-**Swagger/OpenAPI:**
-- [API Docs Interactivos](http://localhost:4000/api/docs) - Documentación completa con Try-it-out
-
----
-
-## Licencia
+## 📄 Licencia
 
 Propietario - Todos los derechos reservados
 
 ---
 
-## Contacto
+## 📧 Contacto
 
 - **Website:** https://viajeroconectado.com
 - **Email:** contact@viajeroconectado.com
-- **Twitter:** [@viajeroconectado](https://twitter.com/viajeroconectado)
 
 ---
 
-**¡Construyamos juntos la red social de viajes más completa del mundo!** 🌍✈️
+**¡Construyendo la mejor red social de viajes!** 🌍✈️
